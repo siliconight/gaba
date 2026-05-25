@@ -1,0 +1,67 @@
+# Companion Conversation
+# A travelling companion the player can talk to at any time. Multiple
+# topics, each looping back to a main menu so the player can ask about
+# other things or leave.
+#
+# The hub-and-spoke shape is the canonical pattern for party members,
+# guildmasters, and any NPC you keep returning to.
+
+NPC: companion
+
+Companion:
+What is on your mind?
+
+Player:
+How are you holding up?
+=> Wellbeing
+
+Player:
+Got any stories?
+=> Story
+
+Player:
+We should keep moving.
+
+Scene: Wellbeing
+Companion:
+Tired. But I have been worse. Do not worry about me.
+
+Player:
+Take a rest sometime.
+=> Main Menu
+
+Player:
+Soldier on, then.
+=> Main Menu
+
+Scene: Story
+Companion:
+There was this one time, before all this, when I worked the harbour at Drystone Bay.
+
+Player:
+Tell me more.
+=> Story Continued
+
+Player:
+Maybe later.
+=> Main Menu
+
+Scene: Story Continued
+Companion:
+A merchant ship caught fire just as it docked. Three sailors made it off. I pulled the fourth out of the water. Heaviest thing I have ever carried.
+=> Main Menu
+
+Scene: Main Menu
+Companion:
+Anything else?
+
+Player:
+How are you holding up?
+=> Wellbeing
+
+Player:
+Got any stories?
+=> Story
+
+Player:
+No, that is all.

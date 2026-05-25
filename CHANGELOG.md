@@ -2,6 +2,24 @@
 
 All notable changes to Gaba will be documented in this file.
 
+## [0.4.3] - 2026-05-25
+
+Stakeholder feedback round 2: confirmed Gaba's direction is narrative-first and asked for finishing-touch items on tone, templates, and positioning. This release lands the small ones; preview pane (the big remaining item) stays the next milestone.
+
+### Added
+- Two more templates from the stakeholder's canonical list:
+  - `08_companion_conversation.dlg` — party-member NPC with hub-and-spoke topics
+  - `09_cinematic_conversation.dlg` — scripted auto-advancing monologue across multiple scenes
+
+### Changed
+- **Validator messages rewritten in writer-tone.** Instead of `Choice 0 targets nonexistent scene 'shoppe'` you now see `Choice "Show me your wares." leads to 'shoppe', but no scene by that name exists.` Same codes, same severities — only the human-readable strings change. Reachability warnings, empty scenes, malformed conditions/effects, and missing-start errors all got the same treatment.
+- README opens with the stakeholder's positioning statement: *A narrative-first dialogue authoring system for Godot 4. Writers describe conversations like screenplays; Gaba compiles them into validated, multiplayer-safe runtime dialogue graphs.*
+
+### Not in this release (and why)
+- **Conversation flow preview pane** — the biggest remaining stakeholder ask. Deferred deliberately: it deserves a focused build after the wizard's recent bug-fix train settles, and it's the kind of editor UI that benefits from being designed against confirmed-stable foundations.
+- **Natural-language directive aliases** (`only if:` for `if:`, `when selected:` for `do:`). Story Mode's current `if:`/`do:` are already friendlier than `CONDITION:`/`EFFECT:`. Adding longer aliases without removing the short ones risks confusion ("which one should I use?"). Will revisit if writers report friction.
+- **Hiding advanced syntax until needed** (item 3 in the feedback). Docs already do this; the text format itself can't hide what isn't typed.
+
 ## [0.4.2] - 2026-05-25
 
 ### Fixed

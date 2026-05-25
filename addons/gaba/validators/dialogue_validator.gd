@@ -176,18 +176,22 @@ static func validate(dialogue: DialogueResource, require_localization: bool = fa
 # --- Top-level metadata ---
 static func _check_dialogue_metadata(d: DialogueResource, r: ValidationReport) -> void:
 	if d.npc_id.is_empty():
-		_add(r, Severity.ERROR, "missing_npc_id", "Dialogue has no NPC id (use 'NPC: <id>' at the top of the file)")
+		_add(r, Severity.ERROR, "missing_npc_id",
+			"This dialogue does not say who the NPC is. Add `NPC: <name>` at the top of the file.")
 	if d.nodes.is_empty():
-		_add(r, Severity.ERROR, "no_nodes", "Dialogue contains no scenes")
+		_add(r, Severity.ERROR, "no_nodes",
+			"This dialogue has no scenes — there is nothing to play.")
 
 
 # --- Start node ---
 static func _check_start_node(d: DialogueResource, r: ValidationReport) -> void:
 	if d.start_node_id.is_empty():
-		_add(r, Severity.ERROR, "missing_start", "Dialogue has no start scene")
+		_add(r, Severity.ERROR, "missing_start",
+			"Could not tell which scene starts the conversation. Story mode uses the first scene automatically; structured mode needs `START: <id>` at the top.")
 		return
 	if not d.has_node(d.start_node_id):
-		_add(r, Severity.ERROR, "broken_start", "Start scene '%s' does not exist" % d.start_node_id)
+		_add(r, Severity.ERROR, "broken_start",
+			"The starting scene '%s' was named but never defined." % d.start_node_id)
 
 
 # --- Link integrity: every choice target must exist ---
@@ -199,8 +203,9 @@ static func _check_node_links(d: DialogueResource, r: ValidationReport) -> void:
 			if choice.target_node_id.is_empty():
 				continue  # terminal choice — legal
 			if not d.has_node(choice.target_node_id):
+				var choice_label := _choice_label(choice, i)
 				_add_node(r, Severity.ERROR, "broken_link", node_id,
-					"Choice %d targets nonexistent scene '%s'" % [i, choice.target_node_id])
+					"%s leads to '%s', but no scene by that name exists." % [choice_label, choice.target_node_id])
 
 
 # --- Node-level content checks ---
@@ -208,13 +213,14 @@ static func _check_node_content(d: DialogueResource, r: ValidationReport, requir
 	for node_id in d.nodes.keys():
 		var node: DialogueNodeResource = d.nodes[node_id]
 		if node.text.is_empty() and node.localization_key.is_empty():
-			_add_node(r, Severity.WARNING, "empty_text", node_id, "Scene has no dialogue text")
+			_add_node(r, Severity.WARNING, "empty_text", node_id,
+				"This scene has no dialogue text. The NPC would stand there silently.")
 		if require_loc and node.localization_key.is_empty() and not node.text.is_empty():
 			_add_node(r, Severity.WARNING, "missing_localization", node_id,
-				"Scene has text but no localization key")
+				"This scene has text but no localization key, so translations will not apply to it.")
 		if not node.voiceover_audio_path.is_empty() and not node.voiceover_audio_path.contains("/"):
 			_add_node(r, Severity.WARNING, "suspicious_vo_path", node_id,
-				"voiceover_audio_path '%s' doesn't look like a path" % node.voiceover_audio_path)
+				"The voice-over path '%s' does not look like a file path. If you meant a sound name from your audio engine's bank, use `vo:` instead of `VO_AUDIO:`." % node.voiceover_audio_path)
 
 
 # --- Conditions and effects: kind must be non-empty ---
@@ -225,22 +231,23 @@ static func _check_conditions_and_effects(d: DialogueResource, r: ValidationRepo
 			var c := node.conditions[i]
 			if c.kind.is_empty():
 				_add_node(r, Severity.ERROR, "malformed_condition", node_id,
-					"Condition %d has empty kind" % i)
+					"Scene condition #%d is empty. Conditions need a kind, e.g. `if: quest_state iron_debt active`." % (i + 1))
 		for i in node.effects.size():
 			var e := node.effects[i]
 			if e.kind.is_empty():
 				_add_node(r, Severity.ERROR, "malformed_effect", node_id,
-					"Effect %d has empty kind" % i)
+					"Scene effect #%d is empty. Effects need a kind, e.g. `do: start_quest iron_debt`." % (i + 1))
 		for ci in node.choices.size():
 			var choice := node.choices[ci]
+			var choice_label := _choice_label(choice, ci)
 			for i in choice.conditions.size():
 				if choice.conditions[i].kind.is_empty():
 					_add_node(r, Severity.ERROR, "malformed_condition", node_id,
-						"Choice %d condition %d has empty kind" % [ci, i])
+						"%s has an empty condition (#%d). Conditions need a kind, e.g. `if: quest_state iron_debt active`." % [choice_label, i + 1])
 			for i in choice.effects.size():
 				if choice.effects[i].kind.is_empty():
 					_add_node(r, Severity.ERROR, "malformed_effect", node_id,
-						"Choice %d effect %d has empty kind" % [ci, i])
+						"%s has an empty effect (#%d). Effects need a kind, e.g. `do: start_quest iron_debt`." % [choice_label, i + 1])
 
 
 # --- Reachability: BFS from start, anything not visited is unreachable ---
@@ -265,7 +272,18 @@ static func _check_reachability(d: DialogueResource, r: ValidationReport) -> voi
 	for node_id in d.nodes.keys():
 		if not visited.has(node_id):
 			_add_node(r, Severity.WARNING, "unreachable", node_id,
-				"Scene is not reachable from the start")
+				"This scene is never reached — no other scene's choices lead to it. Players will not see it.")
+
+
+# Render a choice as something a writer would recognise: the choice text in
+# quotes if it has any, otherwise its 1-based position.
+static func _choice_label(choice: DialogueChoiceResource, index: int) -> String:
+	if not choice.text.is_empty():
+		var trimmed := choice.text
+		if trimmed.length() > 40:
+			trimmed = trimmed.substr(0, 37) + "..."
+		return "Choice \"%s\"" % trimmed
+	return "Choice #%d" % (index + 1)
 
 
 # --- Issue construction helpers ---

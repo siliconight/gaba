@@ -1,0 +1,31 @@
+# Cinematic Conversation
+# A scripted sequence intended for cutscenes — NPC monologue across several
+# scenes, no player branching. Each scene's `=>` after the NPC text creates an
+# implicit "Continue" advance to the next scene.
+#
+# Pair with `playback: auto_advance` (per scene) if you want the runtime to
+# step forward automatically when the voice-over ends; otherwise the player
+# clicks Continue to advance.
+
+NPC: oracle
+
+Oracle:
+Long ago, before the iron gates closed for the last time...
+playback: auto_advance
+=> Beat Two
+
+Scene: Beat Two
+Oracle:
+...the river ran clean from mountain to sea. Children swam in it.
+playback: auto_advance
+=> Beat Three
+
+Scene: Beat Three
+Oracle:
+You have seen the river now. You have travelled through what was lost.
+playback: auto_advance
+=> Beat Four
+
+Scene: Beat Four
+Oracle:
+Go. Restore what your fathers broke.

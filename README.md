@@ -1,8 +1,10 @@
 # Gaba
 
-A Godot-native dialogue authoring and runtime system. Write branching NPC conversations in a simple text format, validate them at import time, and play them back in your game with multiplayer-safe execution.
+**A narrative-first dialogue authoring system for Godot 4.** Writers describe conversations like screenplays; Gaba compiles them into validated, multiplayer-safe runtime dialogue graphs your game plays.
 
-**Status: 0.4.0.** Story Mode authoring, per-choice conditions, friendly validation, a "Create NPC Dialogue" wizard dock, and an optional bridge to the [gool](https://github.com/siliconight/gool) audio engine are working. Validation panel UI and preview pane are next — see [`ROADMAP.md`](ROADMAP.md).
+The product principle: writers should think about *what is happening in the story*, not about graph nodes, IDs, or directives. The graph is real — Gaba compiles to it, runtime walks it, multiplayer replicates it — but you do not have to author in it.
+
+**Status: 0.4.3.** Story Mode authoring, per-choice conditions, writer-friendly validation, a "Create NPC Dialogue" wizard dock, nine NPC templates, one-line install, and an optional bridge to the [gool](https://github.com/siliconight/gool) audio engine are working. Conversation flow preview pane is next — see [`ROADMAP.md`](ROADMAP.md).
 
 ## Features
 

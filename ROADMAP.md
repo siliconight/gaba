@@ -6,6 +6,19 @@ What Gaba is building and what it's deferring, in priority order. This file is t
 
 The product principle driving these items: **"I am writing an NPC conversation," not "I am programming a dialogue graph."** The text-format work shipped in v0.3.0 reduced the cognitive load of authoring; v0.4 brings the same reduction inside the Godot editor.
 
+### Preview / playtest pane (dock) — **NEXT**
+
+A pane that lets a writer click through the conversation without running the game:
+
+- Loads a `DialogueResource` (or live-reparses a `.dlg`)
+- Renders NPC line + visible choices
+- Click a choice → advance
+- Mock condition/effect handlers so per-choice `if:` filtering works without game state
+- Reset button to start over
+- A "▶ Play Conversation" button in the wizard dock that opens this pane on the currently-selected file
+
+Why: writers need to feel the conversation pacing. A graph view shows structure; a preview shows experience. This is the highest-leverage remaining stakeholder ask — flagged repeatedly across feedback rounds as more valuable than a graph editor.
+
 ### Validation panel (dock)
 
 A panel that shows the friendly validation report (already produced by `ValidationReport.format_friendly()` as of v0.3.0) with:
@@ -15,19 +28,7 @@ A panel that shows the friendly validation report (already produced by `Validati
 - Each issue clickable → jumps to the line in the script editor
 - Re-runs on file save / reimport
 
-Why: errors should feel like editor squiggles, not Godot's output panel needles.
-
-### Preview / playtest pane (dock)
-
-A pane that lets a writer click through the conversation without running the game:
-
-- Loads a `DialogueResource` (or live-reparses a `.dlg`)
-- Renders NPC line + visible choices
-- Click a choice → advance
-- Mock condition/effect handlers so per-choice `if:` filtering works without game state
-- Reset button to start over
-
-Why: writers need to feel the conversation pacing. A graph view shows structure; a preview shows experience.
+Why: errors should feel like editor squiggles, not Godot's output panel needles. Lower priority than the preview pane — the friendly format already lands in the Output panel where designers can see it.
 
 ## v0.5.x — graph editor (visible only when wanted)
 
@@ -47,6 +48,20 @@ These don't fit neatly into a milestone but are good-faith TODOs:
 - **Story Mode multiline NPC paragraphs** — currently a `Scene:` break creates two nodes; sometimes you want one node with two paragraphs from the same speaker. The data model already supports it (just a `\n\n` inside `text`); only the format needs a convention.
 
 ## Done
+
+### v0.4.3
+
+- Writer-tone validator messages: `Choice "Show me your wares." leads to 'shoppe', but no scene by that name exists.` instead of `Choice 0 targets nonexistent scene 'shoppe'`. Same codes and severities, friendlier strings.
+- Templates 08 (Companion Conversation) and 09 (Cinematic Conversation) — completes the stakeholder's canonical list of seven NPC patterns and adds the two they'd asked for.
+- README leads with the stakeholder's positioning: *narrative-first dialogue authoring system that compiles into validated multiplayer-safe runtime dialogue graphs*.
+
+### v0.4.2
+
+- Story-mode parser allows digits and periods in speaker names — fixes `R2-D2`, `Mr. Smith`, `Player 1`, `711 guy`, and similar.
+
+### v0.4.1
+
+- One-line install scripts at `scripts/install.{sh,ps1}`. No addon code changes.
 
 ### v0.4.0
 

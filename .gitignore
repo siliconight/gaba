@@ -1,0 +1,26 @@
+# Godot 4+
+.godot/
+.import/
+
+# Imported translations (built from CSV)
+*.translation
+
+# Mono / C# builds (unused here, but standard to ignore)
+.mono/
+data_*/
+mono_crash.*.json
+
+# Exported builds
+build/
+exports/
+*.pck
+*.zip
+*.tar.gz
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db

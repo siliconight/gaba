@@ -1,0 +1,29 @@
+# Example dialogue file demonstrating the Gaba authoring format.
+# Lines starting with `#` are comments and are ignored by the parser.
+
+NPC: blacksmith
+START: greeting
+
+[greeting]
+NPC: Need a blade sharpened?
+VO_EVENT: vo_blacksmith_greeting_01
+SUBTITLE: blacksmith.greeting
+CHOICE: Show me your wares -> shop
+CHOICE: Any work available? -> quest_offer
+CHOICE: Goodbye.
+
+[shop]
+NPC: Take a look. Best steel in the valley.
+EFFECT: open_shop blacksmith_inventory
+CHOICE: Thanks. -> greeting
+
+[quest_offer]
+NPC: I need iron from the old mine. Bandits won't make it easy.
+CONDITION: !quest_state iron_debt active
+CHOICE: I'll help. -> accept_quest
+CHOICE: Maybe later. -> greeting
+
+[accept_quest]
+NPC: Good. Come back when it's done.
+EFFECT: start_quest iron_debt
+END

@@ -2,15 +2,16 @@
 
 A Godot-native dialogue authoring and runtime system. Write branching NPC conversations in a simple text format, validate them at import time, and play them back in your game with multiplayer-safe execution.
 
-**Status: 0.1.0 — MVP.** Text-based authoring, importer, validator, and runtime are working. The visual graph editor is not yet built.
+**Status: 0.3.0.** Story Mode authoring, per-choice conditions, friendly validation, runtime, and an optional bridge to the [gool](https://github.com/siliconight/gool) audio engine are working. Editor UX (wizard dock, validation panel UI, preview pane) is next — see [`ROADMAP.md`](ROADMAP.md).
 
 ## Features
 
-- **Text-first authoring** — `.dlg` files are plain text, diff-friendly, and merge cleanly.
-- **Compile-time validation** — broken links, unreachable nodes, malformed effects, and missing metadata are caught at import.
-- **Runtime-safe resources** — authored files become `.res` resources Godot loads instantly at runtime.
-- **Conditions and effects** — gameplay hooks via a registry pattern. Gaba doesn't know about quests or inventory; your game registers handlers and Gaba calls them.
-- **Voice-over optional** — every node can have a VO event ID, audio path, and subtitle key, or none of those. Text-only dialogue is a first-class workflow.
+- **Story Mode authoring** — write screenplay, not graphs. No node IDs required.
+- **Per-choice conditions and effects** — different choices appear based on quest state, inventory, faction, anything your game exposes.
+- **Designer-friendly validation** — `✓ 4 scenes, 7 choices, 2 endings` in the output panel; clickable validation dock on the roadmap.
+- **Templates** — seven starting points under `templates/` for the canonical NPC patterns (greeting, vendor, quest giver, etc.).
+- **Runtime-safe resources** — authored files compile to `.res` resources Godot loads instantly.
+- **Voice-over optional** — text-only is the happy path; VO fields exist for premium content and stay out of the way otherwise.
 - **Audio-engine integrations** — ships an optional bridge to [gool](https://github.com/siliconight/gool) at `addons/gaba/integrations/gool_bridge.gd`. See [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md).
 - **Multiplayer-aware** — sessions can run in authoritative (server) or replica (client) mode. Server validates choices; client displays.
 
@@ -20,26 +21,37 @@ Drop `addons/gaba/` into your Godot 4 project's `addons/` folder, then enable it
 
 ## Authoring a dialogue
 
-Create a `.dlg` file anywhere in your project:
+Create a `.dlg` file. Story Mode looks like this:
 
 ```
-NPC: blacksmith
-START: greeting
+NPC: Blacksmith
 
-[greeting]
-NPC: Need a blade sharpened?
-CHOICE: Show me your wares -> shop
-CHOICE: Goodbye.
+Blacksmith:
+Need a blade sharpened?
 
-[shop]
-NPC: Take a look. Best steel in the valley.
-EFFECT: open_shop blacksmith_inventory
-CHOICE: Thanks. -> greeting
+Player:
+Show me your wares.
+=> Open Shop
+
+Player:
+Any work available?
+if: !quest_state iron_debt active
+=> Quest Offer
+
+Scene: Open Shop
+Blacksmith:
+Take a look. Best steel in the valley.
+do: open_shop blacksmith_inventory
+
+Scene: Quest Offer
+Blacksmith:
+I need iron from the old mine.
+do: start_quest iron_debt
 ```
 
-Godot will import it on save. You'll get a `DialogueResource` you can `load()` like any other Godot resource.
+Godot imports it on save. The result is a `DialogueResource` you `load()` like any other Godot resource.
 
-See [`docs/AUTHORING.md`](docs/AUTHORING.md) for the full grammar.
+Browse [`templates/`](templates/) for working examples. See [`docs/AUTHORING.md`](docs/AUTHORING.md) for the full reference, including Structured Mode for engineers who want explicit node IDs.
 
 ## Playing a dialogue
 
@@ -88,20 +100,15 @@ addons/gaba/
     integrations/                   # optional bridges (gool_bridge.gd)
     editor/                         # (future) graph editor, validation panel
 
-examples/dialogues/blacksmith.dlg   # canonical example
-docs/                               # AUTHORING.md, ARCHITECTURE.md, MULTIPLAYER.md
+examples/dialogues/blacksmith.dlg   # original canonical example
+templates/                          # 7 designer-facing starting points
+docs/                               # AUTHORING.md, ARCHITECTURE.md, MULTIPLAYER.md,
+                                    #   INTEGRATIONS.md, EXTENDING.md
 ```
 
 ## Roadmap
 
-The MVP is text-based authoring. Future work, in roughly priority order:
-
-- Visual graph editor with drag-and-drop linking
-- Validation panel docked in the editor
-- Dialogue preview / playtest window
-- NPC assignment tooling (browse all dialogues by NPC)
-- Localization export pipeline
-- Built-in condition/effect handlers for common game systems
+See [`ROADMAP.md`](ROADMAP.md). Next milestone is editor UX: a Create NPC Dialogue wizard, validation panel dock, and preview pane. After that, a visual graph editor as a complementary view of the same data.
 
 ## License
 

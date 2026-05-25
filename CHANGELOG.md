@@ -2,6 +2,30 @@
 
 All notable changes to Gaba will be documented in this file.
 
+## [0.3.0] - 2026-05-25
+
+The narrative-designer release. Story Mode authoring format, per-choice conditions/effects, friendly validation output, and seven templates. The product principle now driving Gaba: "I am writing an NPC conversation," not "I am programming a dialogue graph."
+
+### Added
+- **Story Mode** authoring format in the parser. Speaker-driven, no node IDs required, no uppercase directives. Auto-detected: any file without `[bracket]` node headers is treated as story mode. The two formats coexist — both compile to the same `DialogueResource`.
+- **Per-choice conditions and effects**. Story mode: `if:` and `do:` inside a `Player:` block attach to that choice. Structured mode: `CHOICE_IF:` / `CHOICE_DO:` directives accumulate and attach to the next `CHOICE:`. Unblocks the canonical pattern of "different choices appear based on quest state."
+- **`ValidationReport.format_friendly()`** — designer-facing summary (`✓ 4 scenes, 7 choices, 2 endings` etc.) grouped by issue code, emitted to the Godot output panel alongside per-issue push_error/push_warning calls. Designed as the foundation for the eventual editor validation panel; same structured data, just text rendering for now.
+- **Templates** under `templates/`: basic greeting, vendor, quest giver, quest turn-in, ambient barks, branching reputation, full VO story. Copy and rename to start a new NPC.
+- **`ROADMAP.md`** committing the deferred editor-UX work (wizard dock, validation panel UI, preview pane, graph editor) so it doesn't get lost.
+- `Scene:`, `=>`, `if:`, `do:`, `vo:`, `subtitle:`, `playback:` lowercase aliases for story mode.
+
+### Changed
+- **`docs/AUTHORING.md` restructured** to lead with Story Mode. Voice-over is now an "Advanced" section at the bottom. Structured Mode remains documented for engineers and tooling-generated files.
+- Validator language is now scene-centric ("Scene is not reachable from the start") rather than node-centric.
+
+### Deferred (in ROADMAP.md)
+- Create NPC Dialogue wizard dock
+- Validation panel UI dock (text version ships now as foundation)
+- Preview / playtest pane
+- Visual graph editor
+
+These deferred items require an EditorPlugin dock UI that genuinely benefits from being tested interactively in Godot. Shipping them blind would mean shipping mediocre UI. The text-format work in this release lays the data layer they'll consume.
+
 ## [0.2.0] - 2026-05-25
 
 Optional bridge addon for the [gool](https://github.com/siliconight/gool) audio engine.

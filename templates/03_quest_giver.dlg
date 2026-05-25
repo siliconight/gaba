@@ -1,0 +1,64 @@
+# Quest Giver NPC
+# Demonstrates per-choice `if:` conditions — the same NPC shows different
+# player options depending on quest state.
+#
+# This is the killer pattern: "choice A appears if quest is not started,
+# choice B appears if quest is active, choice C appears if quest is complete".
+# Register the `quest_state` condition handler in your game code.
+
+NPC: blacksmith
+
+Blacksmith:
+Need a blade sharpened?
+
+Player:
+Show me your wares.
+=> Open Shop
+
+Player:
+Any work available?
+if: !quest_state iron_debt active
+if: !quest_state iron_debt complete
+=> Quest Offer
+
+Player:
+How is the mine job going?
+if: quest_state iron_debt active
+=> Quest Reminder
+
+Player:
+That iron debt is settled.
+if: quest_state iron_debt complete
+=> Quest Settled
+
+Player:
+Goodbye.
+
+Scene: Open Shop
+Blacksmith:
+Take a look. Best steel in the valley.
+do: open_shop blacksmith_inventory
+
+Scene: Quest Offer
+Blacksmith:
+I need iron from the old mine. Bandits will not make it easy.
+
+Player:
+I will help.
+do: start_quest iron_debt
+=> Quest Accepted
+
+Player:
+Maybe later.
+
+Scene: Quest Accepted
+Blacksmith:
+Good. Come back when it is done.
+
+Scene: Quest Reminder
+Blacksmith:
+Mine still has bandits. Bring iron when you can.
+
+Scene: Quest Settled
+Blacksmith:
+Appreciated. Drinks are on me sometime.

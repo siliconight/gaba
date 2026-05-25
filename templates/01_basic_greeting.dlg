@@ -1,0 +1,25 @@
+# Basic Greeting NPC
+# A pure greeting NPC with no quests, no shop, no voice-over.
+# Good for ambient townsfolk that just have flavour to say.
+#
+# Save a copy in your dialogues/ folder, change "Townsfolk" to your NPC's name,
+# and rewrite the lines. That's it.
+
+NPC: townsfolk
+
+Townsfolk:
+Hello, traveller. Welcome to Aldwick.
+
+Player:
+Thanks. What is there to see?
+=> Sights
+
+Player:
+Just passing through.
+
+Scene: Sights
+Townsfolk:
+The market square is just down the road. And the old chapel is worth a look.
+
+Player:
+I will check them out.

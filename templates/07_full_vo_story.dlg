@@ -1,0 +1,41 @@
+# Full Voice-Over Story NPC
+# This is the only template that uses voice-over fields. Most NPCs do not need
+# them — text-only is a first-class workflow. Use this pattern only for premium
+# story content with recorded audio.
+#
+# `vo:` references a sound name in your audio engine's bank (e.g. a gool sound).
+# `subtitle:` is the localization key for the subtitle text.
+# `playback:` hints at runtime behaviour — see docs/AUTHORING.md for values.
+#
+# The gool bridge (addons/gaba/integrations/gool_bridge.gd) handles all of these
+# automatically. See docs/INTEGRATIONS.md.
+
+NPC: oracle
+
+Oracle:
+You have come a long way, child of the deep wood.
+vo: vo_oracle_intro_01
+subtitle: oracle.intro
+playback: non_interruptible
+=> The Question
+
+Scene: The Question
+Oracle:
+Speak. What is your need?
+vo: vo_oracle_prompt
+subtitle: oracle.prompt
+
+Player:
+Show me the path forward.
+=> The Path
+
+Player:
+I have nothing to ask.
+
+Scene: The Path
+Oracle:
+The path winds north, through the iron gates. You will know the way when you see it.
+vo: vo_oracle_path
+subtitle: oracle.path
+playback: non_interruptible
+do: set_flag oracle_consulted

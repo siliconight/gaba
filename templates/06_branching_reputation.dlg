@@ -1,0 +1,50 @@
+# Branching Reputation NPC
+# Same NPC, three personalities depending on player reputation with their faction.
+# Demonstrates how one dialogue file can serve a full character arc as the
+# player's standing with a faction changes.
+
+NPC: guard_captain
+
+Guard Captain:
+State your business.
+
+Player:
+Just passing through.
+if: faction_at_least guards 0
+if: !faction_at_least guards 50
+=> Neutral Greeting
+
+Player:
+Captain, good to see you.
+if: faction_at_least guards 50
+=> Friendly Greeting
+
+Player:
+You are not the boss of me.
+if: !faction_at_least guards 0
+=> Hostile Response
+
+Scene: Neutral Greeting
+Guard Captain:
+Move along then. Keep to the main road.
+
+Scene: Friendly Greeting
+Guard Captain:
+Always welcome here. There is a job opening if you want it.
+
+Player:
+Tell me more.
+=> Job Offer
+
+Player:
+Another time.
+
+Scene: Job Offer
+Guard Captain:
+Bandit camp east of the river. Clear it and the city pays well.
+do: start_quest bandit_camp
+
+Scene: Hostile Response
+Guard Captain:
+Watch your tongue. Or I will have it.
+do: faction_change guards -5

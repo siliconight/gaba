@@ -1,0 +1,34 @@
+# Vendor / Shopkeeper NPC
+# Demonstrates the `do:` syntax for triggering gameplay effects
+# (open shop, give item, remove gold, etc).
+#
+# Register your handlers with DialogueManager.effects in game code.
+# See docs/EXTENDING.md for the registry pattern.
+
+NPC: merchant
+
+Merchant:
+Welcome to my shop. What can I get you?
+
+Player:
+Show me your wares.
+do: open_shop merchant_inventory
+
+Player:
+What is good around here?
+=> Recommendation
+
+Player:
+I am just browsing.
+
+Scene: Recommendation
+Merchant:
+Mountain honey. Travellers say it cures everything from cough to hangover.
+
+Player:
+I will take a jar.
+do: give_item mountain_honey 1
+do: remove_item gold 25
+
+Player:
+Maybe next time.

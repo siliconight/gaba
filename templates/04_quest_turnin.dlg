@@ -1,0 +1,33 @@
+# Quest Turn-In NPC
+# Demonstrates checking inventory and completing a quest.
+# The "Turn in the iron" choice only appears when the player has the items.
+
+NPC: quartermaster
+
+Quartermaster:
+Back from the mine? You have iron for me?
+
+Player:
+Here is the iron.
+if: has_item iron_ore 5
+if: quest_state iron_debt active
+do: remove_item iron_ore 5
+do: complete_quest iron_debt
+do: give_item gold 200
+=> Quest Complete
+
+Player:
+Still working on it.
+if: !has_item iron_ore 5
+=> Encouragement
+
+Player:
+Goodbye.
+
+Scene: Quest Complete
+Quartermaster:
+That will do. Two hundred gold, as promised. The smiths will sleep easier tonight.
+
+Scene: Encouragement
+Quartermaster:
+Five lumps. That is all I need. Watch the south tunnel — bandits like to ambush there.

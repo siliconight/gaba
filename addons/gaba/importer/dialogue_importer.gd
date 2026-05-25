@@ -83,12 +83,12 @@ func _import(
 	var text := file.get_as_text()
 	file.close()
 
-	# dialogue_id defaults to the source basename, stripped of extension.
 	var dialogue_id := source_file.get_file().get_basename()
 
 	# --- Parse ---
 	var parse_result = PARSER.parse(text, dialogue_id)
 	if not parse_result.ok():
+		print_rich("[color=red][Gaba][/color] %s — parse errors:" % source_file)
 		for err in parse_result.errors:
 			push_error("[Gaba] %s:%d  %s" % [source_file, err["line"], err["message"]])
 		return ERR_PARSE_ERROR
@@ -98,6 +98,13 @@ func _import(
 	var fail_on_warn: bool = options.get("fail_on_warnings", false)
 	var report = VALIDATOR.validate(parse_result.resource, require_loc)
 
+	# Designer-facing summary in the output panel.
+	print("[Gaba] %s" % source_file)
+	print(report.format_friendly())
+
+	# Per-issue lines also pushed through push_error/push_warning so they appear
+	# in the Godot debugger's structured Errors tab (clickable to the line will
+	# be added once the editor dock exists).
 	for issue in report.issues:
 		var location := "%s [%s]" % [source_file, issue.node_id] if not issue.node_id.is_empty() else source_file
 		if issue.severity == VALIDATOR.Severity.ERROR:
@@ -117,5 +124,4 @@ func _import(
 		push_error("[Gaba] Failed to save imported resource to %s: %d" % [out_path, save_err])
 		return save_err
 
-	print("[Gaba] Imported %s (%d nodes)" % [source_file, parse_result.resource.nodes.size()])
 	return OK

@@ -1,0 +1,9 @@
+# Ambient Barks
+# Many small NPCs that say one thing and end. No branching, no shop, no quest.
+# Use one .dlg per bark, or stuff several into one file with different scenes
+# and pick at random in code.
+
+NPC: villager
+
+Villager:
+Mind the goats. They bite if you get too close.

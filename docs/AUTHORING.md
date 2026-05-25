@@ -1,139 +1,212 @@
-# Authoring Dialogue (.dlg) Files
+# Authoring Dialogue
 
-This is the format reference for writing dialogue in Gaba. The format is plain text, line-oriented, and designed to be readable, diffable, and forgiving.
+This is the writer's reference for creating dialogue in Gaba. Two formats are supported in `.dlg` files: **Story Mode** (the default, designer-friendly) and **Structured Mode** (explicit IDs, useful for engineers and code-generated files). Both compile to the same runtime data — pick whichever fits the file.
 
-## File structure
+## Story Mode (recommended)
 
-A file has two sections: a **header** at the top, then **nodes**. Blank lines and `#` comments are allowed anywhere.
+Story Mode reads as a screenplay. You write what the NPC says, what the player can answer, and where each answer leads. Gaba generates the underlying graph for you.
 
 ```
-# header
+NPC: Blacksmith
+
+Blacksmith:
+Need a blade sharpened?
+
+Player:
+Show me your wares.
+=> Open Shop
+
+Player:
+Any work available?
+=> Quest Offer
+
+Scene: Open Shop
+Blacksmith:
+Take a look. Best steel in the valley.
+
+Scene: Quest Offer
+Blacksmith:
+I need iron from the old mine.
+```
+
+That's the whole format. The rules in detail:
+
+### The header
+
+The first line names the NPC:
+
+```
+NPC: Blacksmith
+```
+
+That's it for the header. The first scene begins implicitly with the first speaker line that follows.
+
+### Speakers
+
+A speaker line starts a block:
+
+```
+Blacksmith:
+Need a blade sharpened?
+```
+
+The speaker name can be anything except a reserved keyword. The text after the colon (and on subsequent lines) is what they say. Blank lines within a block become paragraph breaks in the displayed text. The block ends at the next speaker line, the next `Scene:`, or the next `=>`.
+
+### Player choices
+
+A `Player:` block is treated as a choice on the most recent NPC line, not as a new beat. Multiple `Player:` blocks in a row accumulate as multiple choices:
+
+```
+Blacksmith:
+Need a blade sharpened?
+
+Player:
+Show me your wares.
+=> Open Shop
+
+Player:
+Any work available?
+=> Quest Offer
+```
+
+The order of `Player:` blocks is the order shown in the UI.
+
+### Targets
+
+`=>` points a Player choice (or an NPC line) at the scene to advance to:
+
+```
+Player:
+Show me your wares.
+=> Open Shop
+```
+
+`Open Shop` is the scene name, not an ID. Gaba slugifies it (`open_shop`) for the underlying graph. A Player block without `=>` is **terminal** — picking it ends the dialogue.
+
+A bare `=>` after an NPC line (no `Player:` between them) creates a "Continue" prompt — useful for cutscene-style sequences:
+
+```
+Scene: Beat One
+Oracle:
+You have travelled far.
+=> Beat Two
+
+Scene: Beat Two
+Oracle:
+And further still you must go.
+```
+
+### Scenes
+
+`Scene: <Name>` declares a new scene. Scene names are designer-friendly text:
+
+```
+Scene: Quest Offer
+Blacksmith:
+I need iron from the old mine.
+```
+
+The slugified name (`quest_offer` here) is what `=>` targets resolve against — both `=> Quest Offer` and `=> quest_offer` work.
+
+### Per-choice conditions
+
+`if:` inside a `Player:` block makes that choice appear only when the condition passes:
+
+```
+Player:
+How is the mine job going?
+if: quest_state iron_debt active
+=> Mine Update
+```
+
+Multiple `if:` lines act as AND (all must pass). Prefix with `!` to negate:
+
+```
+Player:
+Any work available?
+if: !quest_state iron_debt active
+if: !quest_state iron_debt complete
+=> Quest Offer
+```
+
+Conditions are evaluated at runtime by handlers your game registers with `DialogueManager.conditions`. Gaba doesn't ship a quest system, inventory, or faction logic — you wire those in. See [EXTENDING.md](EXTENDING.md).
+
+### Per-choice effects
+
+`do:` inside a `Player:` block fires a gameplay effect when the choice is selected:
+
+```
+Player:
+I will help.
+do: start_quest iron_debt
+=> Quest Accepted
+```
+
+Effects fire **before** the scene transition, so the target scene's conditions see the post-effect state. Multiple `do:` lines fire in order.
+
+### Node-level conditions and effects
+
+`if:` and `do:` outside a `Player:` block apply to the current scene rather than a choice. Less common but useful for "this scene triggers an event when entered":
+
+```
+Scene: Quest Accepted
+Blacksmith:
+Good. Come back when it is done.
+do: log_journal "Iron from the mine"
+```
+
+### Comments
+
+Lines starting with `#` are comments:
+
+```
+# Quartermaster — only available after the bandit camp questline opens
+NPC: quartermaster
+```
+
+## Templates
+
+Gaba ships starting points under `templates/`:
+
+| File | What it shows |
+|------|---------------|
+| `01_basic_greeting.dlg` | Bare-minimum greeting NPC, no quests |
+| `02_vendor.dlg` | Shop NPC with `do:` effects (open_shop, give_item) |
+| `03_quest_giver.dlg` | Per-choice `if:` to show different options by quest state |
+| `04_quest_turnin.dlg` | Inventory check + quest completion |
+| `05_ambient_barks.dlg` | Tiny one-line NPCs |
+| `06_branching_reputation.dlg` | Same NPC, three personalities by faction standing |
+| `07_full_vo_story.dlg` | The advanced one — voice-over and subtitle keys |
+
+Copy any of these to your `dialogues/` folder, rename, and rewrite the lines.
+
+## Structured Mode
+
+Structured Mode uses explicit `[node_id]` headers and uppercase directives. Useful when:
+
+- You want full control over node IDs (e.g. tooling generates `.dlg` files)
+- You're an engineer who finds the explicit form clearer
+- You're integrating with an existing dialogue graph format
+
+```
 NPC: blacksmith
 START: greeting
 
-# nodes follow
-[greeting]
-NPC: Welcome.
-CHOICE: Bye.
-```
-
-## Header
-
-The header sets file-wide metadata. Both directives are required.
-
-| Directive | Meaning |
-|-----------|---------|
-| `NPC: <id>` | The NPC this dialogue belongs to. Used by gameplay code to look up dialogues by NPC. |
-| `START: <node_id>` | The node where playback begins. Must match a `[node_id]` defined later. |
-
-## Nodes
-
-A node starts with `[node_id]` on its own line and continues until the next `[...]` header or end-of-file. Node IDs must be unique within a file.
-
-Inside a node, each line is a directive. The supported directives:
-
-### Dialogue text
-
-```
-NPC: Need a blade sharpened?
-```
-
-`NPC:` inside a node sets the speaker's line. Each node can have at most one `NPC:` line (use multiple nodes for multi-beat speeches).
-
-### Speaker override
-
-```
-SPEAKER: King Aldric
-```
-
-Optional. Defaults to the file's NPC id. Useful for cutscenes where multiple characters speak through the same dialogue.
-
-### Choices
-
-```
-CHOICE: Show me your wares -> shop
-CHOICE: Goodbye.
-```
-
-A choice with `-> target` transitions to that node when selected. A choice without `->` is **terminal** — selecting it ends the dialogue. The order of `CHOICE:` lines is the order shown in the UI.
-
-A node with **no choices** is also terminal.
-
-### Conditions
-
-```
-CONDITION: has_item iron_ore 3
-CONDITION: !quest_state iron_debt complete
-```
-
-A condition gates whether the node (or choice it's attached to) is available. Format: `kind` followed by space-separated args. Prefix with `!` to negate.
-
-Conditions on a **node** are evaluated when the runtime considers entering the node. Conditions on a **choice** filter it from the visible choice list. Game code defines what `has_item`, `quest_state`, etc. mean by registering handlers — see [EXTENDING.md](EXTENDING.md).
-
-To attach a condition to a choice rather than the node, put it on a line **before** that choice. (The current MVP applies all `CONDITION:` lines to the node; per-choice conditions are tracked under `choices[i].conditions` and can be set programmatically. A `CHOICE_IF:` directive is on the roadmap.)
-
-### Effects
-
-```
-EFFECT: start_quest iron_debt
-EFFECT: give_item gold 50
-```
-
-Effects fire as gameplay side-effects. Effects on a node fire when the node is entered. Effects on a choice fire when the choice is selected, *before* transitioning to the target.
-
-### Voice-over
-
-```
-VO_EVENT: vo_blacksmith_greeting_01
-VO_AUDIO: res://audio/vo/blacksmith/greeting.ogg
-SUBTITLE: blacksmith.greeting
-PLAYBACK: non_interruptible
-```
-
-All optional. `VO_EVENT` points at an event in your audio system (e.g. an FMOD/Wwise event or a [gool](https://github.com/siliconight/gool) sound name). `VO_AUDIO` is a direct file path. `SUBTITLE` is the localization key for subtitle text (may differ from the node's display text). `PLAYBACK` hints at runtime behavior — values are arbitrary strings interpreted by your UI/audio code.
-
-If you're using gool, see [INTEGRATIONS.md](INTEGRATIONS.md) for the bridge that wires `VO_EVENT` to gool's emitter API automatically.
-
-### Localization
-
-```
-LOC: blacksmith.greeting
-```
-
-Sets the localization key for the node's display text. If unset, the runtime falls back to the raw `NPC:` text.
-
-### Explicit end
-
-```
-END
-```
-
-Marks the node as terminal. Equivalent to having no choices, but explicit. Useful when you want a node that has effects but no further branching.
-
-## Complete example
-
-```
-NPC: blacksmith
-START: greeting
-
 [greeting]
 NPC: Need a blade sharpened?
-VO_EVENT: vo_blacksmith_greeting_01
-SUBTITLE: blacksmith.greeting
 CHOICE: Show me your wares -> shop
 CHOICE: Any work available? -> quest_offer
-CHOICE: Goodbye.
 
 [shop]
 NPC: Take a look. Best steel in the valley.
 EFFECT: open_shop blacksmith_inventory
-CHOICE: Thanks. -> greeting
+CHOICE: Thanks -> greeting
 
 [quest_offer]
 NPC: I need iron from the old mine.
-CONDITION: !quest_state iron_debt active
-CHOICE: I'll help. -> accept_quest
-CHOICE: Maybe later. -> greeting
+CHOICE_IF: !quest_state iron_debt active
+CHOICE: I'll help -> accept_quest
+CHOICE: Maybe later -> greeting
 
 [accept_quest]
 NPC: Good. Come back when it's done.
@@ -141,19 +214,87 @@ EFFECT: start_quest iron_debt
 END
 ```
 
+Auto-detection: a file is treated as Structured Mode if any line is a bare `[identifier]` header, otherwise Story Mode.
+
+### Structured directives reference
+
+| Directive | Effect |
+|-----------|--------|
+| `NPC: <id>` (file head) | Sets the dialogue's NPC id |
+| `START: <node_id>` | Sets the starting node |
+| `[<node_id>]` | Begins a node |
+| `NPC: <text>` (in a node) | Sets the node's dialogue text |
+| `SPEAKER: <name>` | Overrides the speaker name (default = NPC id) |
+| `CHOICE: <text> -> <target>` | Adds a choice with a transition target |
+| `CHOICE: <text>` | Adds a terminal choice (ends the dialogue) |
+| `CHOICE_IF: <condition>` | Attaches a condition to the *next* CHOICE: |
+| `CHOICE_DO: <effect>` | Attaches an effect to the *next* CHOICE: |
+| `CONDITION: <kind> <args...>` | Node-level condition (prefix `!` to negate) |
+| `EFFECT: <kind> <args...>` | Node-level effect |
+| `LOC: <key>` | Localization key for the node's text |
+| `END` | Marks the node as terminal explicitly |
+
+Plus the voice-over directives — see the next section.
+
+## Advanced: voice-over
+
+Most NPCs don't need voice-over and you can skip this section entirely. For premium story content with recorded audio, attach VO data per scene.
+
+### Story Mode
+
+```
+Oracle:
+You have travelled far.
+vo: vo_oracle_intro_01
+subtitle: oracle.intro
+playback: non_interruptible
+```
+
+### Structured Mode
+
+```
+[oracle_intro]
+NPC: You have travelled far.
+VO_EVENT: vo_oracle_intro_01
+SUBTITLE: oracle.intro
+PLAYBACK: non_interruptible
+```
+
+### Fields
+
+| Field | Meaning |
+|-------|---------|
+| `vo:` / `VO_EVENT:` | Sound name in your audio engine's bank (e.g. a [gool](https://github.com/siliconight/gool) sound name, FMOD event, Wwise event) |
+| `VO_AUDIO:` | Direct file path; alternative to `VO_EVENT:` for projects without a bank |
+| `subtitle:` / `SUBTITLE:` | Localization key for subtitle text (may differ from display text) |
+| `playback:` / `PLAYBACK:` | Behaviour hint: `interruptible`, `non_interruptible`, `skippable`, `auto_advance` |
+
+Playback behaviour is interpreted by your runtime / UI / audio code. If you're using gool, the bridge addon at `addons/gaba/integrations/gool_bridge.gd` handles all four behaviours — see [INTEGRATIONS.md](INTEGRATIONS.md).
+
 ## Validation
 
-The importer runs every file through the validator and surfaces issues in the Godot output panel. Errors block import; warnings let the file import but get logged.
+The importer runs every file through the validator and surfaces a friendly summary in the Godot output panel:
+
+```
+[Gaba] res://dialogues/blacksmith.dlg
+✓ 4 scenes, 7 choices, 2 endings
+⚠ 1 unreachable scene
+  - [mine_update] Scene is not reachable from the start
+```
+
+Errors block import; warnings let the file import but get logged. Issues:
 
 | Code | Severity | Meaning |
 |------|----------|---------|
 | `missing_npc_id` | error | No `NPC:` at the file top |
-| `no_nodes` | error | File contains zero nodes |
-| `missing_start` | error | No `START:` directive |
-| `broken_start` | error | `START:` points at a nonexistent node |
-| `broken_link` | error | A `CHOICE:` target doesn't exist |
+| `no_nodes` | error | File contains zero scenes |
+| `missing_start` | error | No start scene declared or inferred |
+| `broken_start` | error | Start scene doesn't exist |
+| `broken_link` | error | A choice target doesn't exist |
 | `malformed_condition` / `malformed_effect` | error | Empty kind on a condition or effect |
-| `empty_text` | warning | Node has no dialogue text |
-| `unreachable` | warning | Node can't be reached from START |
-| `missing_localization` | warning | Node has text but no LOC key (only with `require_localization` import option) |
+| `empty_text` | warning | Scene has no dialogue text |
+| `unreachable` | warning | Scene can't be reached from the start |
+| `missing_localization` | warning | Scene has text but no LOC key (only with `require_localization` import option) |
 | `suspicious_vo_path` | warning | `VO_AUDIO:` value doesn't contain a `/` |
+
+A clickable validation panel inside the editor is on the roadmap — see [ROADMAP.md](../ROADMAP.md).

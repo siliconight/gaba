@@ -2,6 +2,26 @@
 
 All notable changes to Gaba will be documented in this file.
 
+## [0.4.0] - 2026-05-25
+
+The first piece of editor UX: a "Create NPC Dialogue" wizard dock.
+
+### Added
+- **Wizard dock** at `addons/gaba/editor/dialogue_wizard_dock.gd`, registered by `plugin.gd` into the right-bottom-left dock slot. Form fields: NPC name, template picker (descriptions read from each template's leading comment block), save directory (with browse), filename (auto-derived from NPC name, editable). Click Create → reads template, substitutes both the NPC id (slugified) and the speaker display name throughout, writes the file, rescans the filesystem so Godot imports the new `.dlg`, selects it in the FileSystem dock.
+- Templates now ship under **`addons/gaba/templates/`** (moved from the top-level `templates/` directory) so they're available at runtime to projects that only install the addon folder. Drop your own `.dlg` templates in the same directory and they appear in the wizard's dropdown automatically — the leading `#` comment lines become the title and description.
+
+### Changed
+- `addons/gaba/plugin.gd` now registers/unregisters the wizard dock alongside the importer and autoload.
+- Top-level `templates/` directory is removed (its files moved into the addon). If you have a working copy from v0.3.0, run `git rm -r templates` before pulling.
+
+### Caveats
+This is editor UI and cannot be validated outside of a running Godot editor. The code is conservative — UI built programmatically (no `.tscn`), every Godot API call null-checked, no clever idioms — but the first test should be installing the addon, opening the editor, and watching for the "Gaba" dock tab. If the dock fails to appear, look in the Output panel for plugin-load errors. See the README for the first-run recipe.
+
+### Roadmap moved to "Done"
+- ~~Create NPC Dialogue wizard (dock)~~ — shipped
+
+Still on the v0.4.x roadmap: validation panel dock (consumes the existing `format_friendly()` data), preview/playtest pane.
+
 ## [0.3.0] - 2026-05-25
 
 The narrative-designer release. Story Mode authoring format, per-choice conditions/effects, friendly validation output, and seven templates. The product principle now driving Gaba: "I am writing an NPC conversation," not "I am programming a dialogue graph."

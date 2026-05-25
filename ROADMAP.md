@@ -6,17 +6,6 @@ What Gaba is building and what it's deferring, in priority order. This file is t
 
 The product principle driving these items: **"I am writing an NPC conversation," not "I am programming a dialogue graph."** The text-format work shipped in v0.3.0 reduced the cognitive load of authoring; v0.4 brings the same reduction inside the Godot editor.
 
-### Create NPC Dialogue wizard (dock)
-
-A button in a Gaba dock that runs through:
-
-1. NPC name (free text)
-2. Dialogue type — Greeting / Vendor / Quest Giver / Quest Turn-In / Ambient Bark / Reputation-Branching / Full VO Story
-3. Save location (defaults to `res://dialogues/`)
-4. Click Create → copies the matching template from `templates/`, renames the NPC, opens the file in the script editor
-
-Why: removes first-use friction. A writer should not need to learn the `.dlg` format before writing their first NPC.
-
 ### Validation panel (dock)
 
 A panel that shows the friendly validation report (already produced by `ValidationReport.format_friendly()` as of v0.3.0) with:
@@ -58,6 +47,11 @@ These don't fit neatly into a milestone but are good-faith TODOs:
 - **Story Mode multiline NPC paragraphs** — currently a `Scene:` break creates two nodes; sometimes you want one node with two paragraphs from the same speaker. The data model already supports it (just a `\n\n` inside `text`); only the format needs a convention.
 
 ## Done
+
+### v0.4.0
+
+- "Create NPC Dialogue" wizard dock (`addons/gaba/editor/dialogue_wizard_dock.gd`) — NPC name + template + save location + filename. Substitutes both the NPC id and the speaker display name throughout the template file. Reads template metadata (title + description) from each file's leading `#` comment block, so user-added templates appear in the dropdown automatically.
+- Templates relocated to `addons/gaba/templates/` (from the top-level `templates/`) so they ship with the addon to projects that install only `addons/gaba/`.
 
 ### v0.3.0
 

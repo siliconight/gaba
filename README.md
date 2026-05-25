@@ -18,7 +18,23 @@ A Godot-native dialogue authoring and runtime system. Write branching NPC conver
 
 ## Install
 
-Drop `addons/gaba/` into your Godot 4 project's `addons/` folder, then enable it under **Project → Project Settings → Plugins**. The importer, `DialogueManager` autoload, and **Gaba** wizard dock register automatically. Look for the **Gaba** tab in the right-side editor docks.
+**One-liner** (from your Godot project's root directory):
+
+```bash
+# Linux / macOS
+curl -fsSL https://raw.githubusercontent.com/siliconight/gaba/main/scripts/install.sh | bash
+```
+
+```powershell
+# Windows / PowerShell
+irm https://raw.githubusercontent.com/siliconight/gaba/main/scripts/install.ps1 | iex
+```
+
+Pin a version with `GABA_TAG=v0.4.1` (bash) or `$env:GABA_TAG="v0.4.1"` (PowerShell) before the one-liner.
+
+**Manual install:** download a [release archive](https://github.com/siliconight/gaba/releases), extract `addons/gaba/` from it into your project's `addons/` folder.
+
+Either way, enable the plugin under **Project → Project Settings → Plugins**. The importer, `DialogueManager` autoload, and **Gaba** wizard dock register automatically. Look for the **Gaba** tab in the right-side editor docks.
 
 ## Authoring a dialogue
 

@@ -2,6 +2,24 @@
 
 All notable changes to Gaba will be documented in this file.
 
+## [0.4.1] - 2026-05-25
+
+Install scripts. No addon code changes.
+
+### Added
+- `scripts/install.sh` — one-line installer for Linux / macOS:
+  ```
+  curl -fsSL https://raw.githubusercontent.com/siliconight/gaba/main/scripts/install.sh | bash
+  ```
+- `scripts/install.ps1` — one-line installer for Windows / PowerShell:
+  ```
+  irm https://raw.githubusercontent.com/siliconight/gaba/main/scripts/install.ps1 | iex
+  ```
+- Both scripts download the GitHub archive, verify `project.godot` exists, refuse to overwrite an existing `addons/gaba/`, copy the addon folder into place, and print next-step instructions. Support `GABA_TAG` env var to pin a version (defaults to `main`).
+
+### Why this is lighter than gool's
+gool needs `git clone → cmake → build` because it's a C++ library producing a binary. Gaba is pure GDScript, so the install is just "copy the folder." The script wraps that in one curl invocation.
+
 ## [0.4.0] - 2026-05-25
 
 The first piece of editor UX: a "Create NPC Dialogue" wizard dock.

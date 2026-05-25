@@ -2,6 +2,17 @@
 
 All notable changes to Gaba will be documented in this file.
 
+## [0.2.0] - 2026-05-25
+
+Optional bridge addon for the [gool](https://github.com/siliconight/gool) audio engine.
+
+### Added
+- `addons/gaba/integrations/gool_bridge.gd` — optional autoload that routes Gaba voice-over to gool. Implements all four `playback_behavior` modes (interruptible, non_interruptible, skippable, auto_advance). Defensive about gool's API surface: asserts `Gool.has_sound()` before `create_emitter`, prefers gool's `emitter_finished` signal for VO completion but falls back to a Timer driven by `subtitle_timing_data.duration_ms` (or a configurable default) when the signal is absent. Goes inert with one warning if gool isn't installed, so dialogue still plays text-only.
+- `docs/INTEGRATIONS.md` — Gaba↔gool field mapping table, bridge activation steps, UI contract for non_interruptible and skippable, and the speculative gool method names the bridge expects.
+
+### Fixed
+- Placeholder gool link in `docs/AUTHORING.md` now points at the real repo.
+
 ## [0.1.0] - 2026-05-25
 
 Initial MVP.

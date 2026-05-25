@@ -11,6 +11,7 @@ A Godot-native dialogue authoring and runtime system. Write branching NPC conver
 - **Runtime-safe resources** — authored files become `.res` resources Godot loads instantly at runtime.
 - **Conditions and effects** — gameplay hooks via a registry pattern. Gaba doesn't know about quests or inventory; your game registers handlers and Gaba calls them.
 - **Voice-over optional** — every node can have a VO event ID, audio path, and subtitle key, or none of those. Text-only dialogue is a first-class workflow.
+- **Audio-engine integrations** — ships an optional bridge to [gool](https://github.com/siliconight/gool) at `addons/gaba/integrations/gool_bridge.gd`. See [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md).
 - **Multiplayer-aware** — sessions can run in authoritative (server) or replica (client) mode. Server validates choices; client displays.
 
 ## Install
@@ -84,6 +85,7 @@ addons/gaba/
     importer/                       # .dlg → Resource pipeline
     validators/                     # semantic validation
     runtime/                        # DialogueManager + DialogueSession + registries
+    integrations/                   # optional bridges (gool_bridge.gd)
     editor/                         # (future) graph editor, validation panel
 
 examples/dialogues/blacksmith.dlg   # canonical example

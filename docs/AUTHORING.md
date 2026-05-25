@@ -90,7 +90,9 @@ SUBTITLE: blacksmith.greeting
 PLAYBACK: non_interruptible
 ```
 
-All optional. `VO_EVENT` points at an event in your audio system (e.g. an FMOD/Wwise event or a [gool](https://github.com/) sound name). `VO_AUDIO` is a direct file path. `SUBTITLE` is the localization key for subtitle text (may differ from the node's display text). `PLAYBACK` hints at runtime behavior — values are arbitrary strings interpreted by your UI/audio code.
+All optional. `VO_EVENT` points at an event in your audio system (e.g. an FMOD/Wwise event or a [gool](https://github.com/siliconight/gool) sound name). `VO_AUDIO` is a direct file path. `SUBTITLE` is the localization key for subtitle text (may differ from the node's display text). `PLAYBACK` hints at runtime behavior — values are arbitrary strings interpreted by your UI/audio code.
+
+If you're using gool, see [INTEGRATIONS.md](INTEGRATIONS.md) for the bridge that wires `VO_EVENT` to gool's emitter API automatically.
 
 ### Localization
 

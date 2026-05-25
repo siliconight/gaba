@@ -477,8 +477,10 @@ func _slugify(s: String) -> String:
 	return out
 
 
-# True if [param prefix] looks like a proper-noun speaker label (letters, spaces,
-# apostrophes, hyphens). Used to avoid mistaking dialogue text for speaker headers.
+# True if [param prefix] looks like a proper-noun speaker label (letters,
+# digits, spaces, apostrophes, hyphens, periods). Used to find the existing
+# speaker name in a template so it can be substituted. Must match the
+# parser's _match_speaker_header in dialogue_parser.gd.
 func _is_speaker_like(prefix: String) -> bool:
 	if prefix.is_empty() or prefix.length() > 64:
 		return false
@@ -486,6 +488,7 @@ func _is_speaker_like(prefix: String) -> bool:
 		var ch := prefix[i]
 		var code := ch.unicode_at(0)
 		var is_alpha := (code >= 0x41 and code <= 0x5A) or (code >= 0x61 and code <= 0x7A)
-		if not (is_alpha or ch == " " or ch == "'" or ch == "-"):
+		var is_digit := code >= 0x30 and code <= 0x39
+		if not (is_alpha or is_digit or ch == " " or ch == "'" or ch == "-" or ch == "."):
 			return false
 	return true

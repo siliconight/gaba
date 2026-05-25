@@ -458,14 +458,17 @@ static func _match_speaker_header(line: String) -> String:
 	var prefix := line.substr(0, colon_idx).strip_edges()
 	if prefix.is_empty() or prefix.length() > 64:
 		return ""
-	# Must be all letters, spaces, apostrophes, or hyphens (proper-noun shaped).
+	# Speaker names are short proper-noun-shaped tokens: letters, digits,
+	# spaces, apostrophes, hyphens, periods. Allows "Captain Aldric",
+	# "R2-D2", "Mr. Smith", "Player 1", and so on.
 	for j in prefix.length():
 		var ch := prefix[j]
 		var code := ch.unicode_at(0)
 		var is_alpha := (code >= 0x41 and code <= 0x5A) or (code >= 0x61 and code <= 0x7A)
+		var is_digit := code >= 0x30 and code <= 0x39
 		var is_space := ch == " "
-		var is_punct := ch == "'" or ch == "-"
-		if not (is_alpha or is_space or is_punct):
+		var is_punct := ch == "'" or ch == "-" or ch == "."
+		if not (is_alpha or is_digit or is_space or is_punct):
 			return ""
 	# Reserved keywords are never speaker names.
 	if prefix.to_lower() in _RESERVED_SPEAKERS:

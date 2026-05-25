@@ -2,6 +2,14 @@
 
 All notable changes to Gaba will be documented in this file.
 
+## [0.4.2] - 2026-05-25
+
+### Fixed
+- Story-mode parser rejected speaker names containing digits or periods (e.g. `R2-D2:`, `Mr. Smith:`, `Player 1:`, `711 guy:`), causing the file to fail import with a red X in the FileSystem dock. The wizard happily substituted the user's NPC name into the speaker block but the parser then refused to recognize the result.
+- Speaker name detection now accepts letters, digits, spaces, apostrophes, hyphens, and periods. The wizard's old-speaker detector (`_is_speaker_like`) was updated in the same way for symmetry, so custom templates with digit-containing speakers also parse correctly.
+
+After pulling, right-click any failed `.dlg` in the FileSystem dock and choose Reimport — no need to recreate the file.
+
 ## [0.4.1] - 2026-05-25
 
 Install scripts. No addon code changes.

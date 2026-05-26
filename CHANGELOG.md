@@ -2,6 +2,29 @@
 
 All notable changes to Gaba will be documented in this file.
 
+## [0.4.5] - 2026-05-25
+
+Stakeholder feedback round 3 landing. Five items shipped, two deferred to v0.5 with explicit roadmap entries (implicit scene linking; Writer/Engineer mode toggle), three already covered.
+
+### Added
+- **`NarrativeHooks`** — a designer-facing facade over `DialogueManager.effects.register` and `DialogueManager.conditions.register`. Lives at `addons/gaba/runtime/narrative_hooks.gd`. Both old and new APIs work; new docs use the new naming. Bulk-register via `NarrativeHooks.register_effects({...})` from a dictionary. Reframes the runtime wiring as "hooking narrative into gameplay" rather than "registering callbacks on the manager".
+
+### Changed
+- **Validator messages pushed further** toward narrative tone per stakeholder examples:
+  - "Players never reach this part of the conversation — no other scene's choices lead here." *(was: "This scene is never reached...")*
+  - "Choice \"X\" does not continue the conversation — there is no scene called 'Y'." *(was: "leads to 'Y', but no scene by that name exists")*
+- **README restructured** around the workflow arc (Create → Write → Preview → Hook → Ship). Templates promoted from a single feature bullet to a primary getting-started path with a full table of nine patterns. README code example switched to `NarrativeHooks`.
+- **Wizard tooltips** rewritten as narrative-first descriptions: "The character the player will be talking to" instead of unlabeled fields.
+- **Preview empty state** uses warmer language: "Pick a .dlg file above and click Load to walk through the conversation as a player would."
+
+### Deferred (with ROADMAP entries)
+- **Implicit scene linking** — drop `=>` for linear progression. Breaking change for current `Player:` semantics; needs migration story. v0.5.
+- **Writer Mode / Engineer Mode toggle** — Editor Setting that hides technical surfaces from writers, exposes them to engineers. v0.5.
+
+### Already covered (mentioned in feedback)
+- Preview pane (shipped v0.4.4)
+- Optional gool bridge as separate addon (shipped v0.2.0)
+
 ## [0.4.4] - 2026-05-25
 
 The conversation flow preview pane — the last remaining substantive stakeholder ask. Writers can now click through a `.dlg` like a player and feel the pacing, without launching the game.

@@ -281,7 +281,7 @@ func _load_current_path() -> void:
 
 func _render_empty_state() -> void:
 	_speaker_label.text = ""
-	_text_label.text = "Load a .dlg file to begin previewing."
+	_text_label.text = "Pick a .dlg file above and click Load to walk through the conversation as a player would."
 	_clear_children(_choices_container)
 	_scene_indicator.text = ""
 	_render_effects_log()

@@ -205,7 +205,7 @@ static func _check_node_links(d: DialogueResource, r: ValidationReport) -> void:
 			if not d.has_node(choice.target_node_id):
 				var choice_label := _choice_label(choice, i)
 				_add_node(r, Severity.ERROR, "broken_link", node_id,
-					"%s leads to '%s', but no scene by that name exists." % [choice_label, choice.target_node_id])
+					"%s does not continue the conversation — there is no scene called '%s'." % [choice_label, choice.target_node_id])
 
 
 # --- Node-level content checks ---
@@ -272,7 +272,7 @@ static func _check_reachability(d: DialogueResource, r: ValidationReport) -> voi
 	for node_id in d.nodes.keys():
 		if not visited.has(node_id):
 			_add_node(r, Severity.WARNING, "unreachable", node_id,
-				"This scene is never reached — no other scene's choices lead to it. Players will not see it.")
+				"Players never reach this part of the conversation — no other scene's choices lead here.")
 
 
 # Render a choice as something a writer would recognise: the choice text in

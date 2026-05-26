@@ -2,7 +2,37 @@
 
 What Gaba is building and what it's deferring, in priority order. This file is the canonical commitment list — items here are real plans, not wishes.
 
-## v0.4.x — editor UX
+## v0.5.x — narrative-first refinements
+
+### Implicit scene linking (parser change)
+
+Currently a Player choice without `=>` is terminal. The stakeholder's vision is:
+
+```
+Player:
+Show me your wares.
+
+Blacksmith:
+Take a look. Best steel in the valley.
+```
+
+— the Player choice's target inferred to be a new scene containing the following NPC block, no explicit `=>` needed. Same idea for consecutive NPC blocks (cinematic pattern): implicit "Continue" advance between them.
+
+Why this is deferred: it changes the semantics of valid existing syntax. A Player block without `=>` was terminal in v0.4.x; making it implicitly link is a breaking change for shipped templates and any user file relying on the current behaviour. The right path forward is either (a) a file-level opt-in flag, or (b) a version-bumped parser change with a clear migration note. Worth its own focused turn.
+
+### Writer Mode / Engineer Mode toggle
+
+Stakeholder feedback round 3 item 5: an editor toggle that hides "engineer" surfaces (structured directives, runtime IDs, validator codes, gameplay metadata) from writers, and exposes them to engineers when they need them.
+
+What this would touch:
+- Wizard dock: hide the structured-mode template option in Writer Mode
+- Preview dock: hide the scene id indicator and effects-log diagnostic source tags in Writer Mode
+- Validation output: drop the parenthetical issue codes in Writer Mode
+- AUTHORING.md: Writer Mode sees only the Story Mode section; Engineer Mode sees the full reference
+
+Implementation note: a single Editor Settings toggle (`gaba/writer_mode: bool`) that the docks read on `_ready` and on settings change. Not particularly hard; deferred because it touches every UI surface and benefits from being designed once we've heard from a real writer.
+
+## v0.4.x — editor UX (still open)
 
 The product principle driving these items: **"I am writing an NPC conversation," not "I am programming a dialogue graph."** The text-format work shipped in v0.3.0 reduced the cognitive load of authoring; v0.4 brings the same reduction inside the Godot editor.
 
@@ -39,6 +69,12 @@ These don't fit neatly into a milestone but are good-faith TODOs:
 - **Story Mode multiline NPC paragraphs** — currently a `Scene:` break creates two nodes; sometimes you want one node with two paragraphs from the same speaker. The data model already supports it (just a `\n\n` inside `text`); only the format needs a convention.
 
 ## Done
+
+### v0.4.5
+
+- `NarrativeHooks` runtime facade — designer-facing alias over `DialogueManager.effects.register` / `.conditions.register`. Both APIs work; new docs use the new naming. Bulk-register via `NarrativeHooks.register_effects({...})`.
+- Validator messages pushed further toward narrative tone: `Players never reach this part of the conversation` (was: "Scene is never reached..."), `Choice "X" does not continue the conversation` (was: "leads to 'Y', but no scene...").
+- README rewrites: workflow-arc framing (Create → Write → Preview → Hook → Ship), templates promoted from a feature bullet to a primary getting-started path with a full table, narrative-first language in wizard tooltips and preview empty state.
 
 ### v0.4.4
 

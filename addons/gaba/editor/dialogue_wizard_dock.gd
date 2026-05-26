@@ -86,6 +86,7 @@ func _build_ui() -> void:
 	form.add_child(_section_label("NPC name"))
 	_npc_name_edit = LineEdit.new()
 	_npc_name_edit.placeholder_text = "Captain Aldric"
+	_npc_name_edit.tooltip_text = "The character the player will be talking to."
 	_npc_name_edit.text_changed.connect(_on_npc_name_changed)
 	form.add_child(_npc_name_edit)
 
@@ -96,6 +97,7 @@ func _build_ui() -> void:
 
 	_template_option = OptionButton.new()
 	_template_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_template_option.tooltip_text = "A starting story pattern. Greeting, vendor, quest giver, companion — pick whichever shape the conversation needs."
 	_template_option.item_selected.connect(_on_template_selected)
 	template_row.add_child(_template_option)
 
@@ -118,6 +120,7 @@ func _build_ui() -> void:
 
 	_save_dir_edit = LineEdit.new()
 	_save_dir_edit.text = DEFAULT_OUTPUT_DIR
+	_save_dir_edit.tooltip_text = "Where in your project the dialogue file will be saved."
 	_save_dir_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	save_row.add_child(_save_dir_edit)
 
@@ -131,6 +134,7 @@ func _build_ui() -> void:
 	form.add_child(_section_label("Filename"))
 	_filename_edit = LineEdit.new()
 	_filename_edit.placeholder_text = "my_npc.dlg"
+	_filename_edit.tooltip_text = "Auto-derived from the NPC name — edit if you want a different filename."
 	_filename_edit.text_changed.connect(_on_filename_changed_by_user)
 	form.add_child(_filename_edit)
 
@@ -141,6 +145,7 @@ func _build_ui() -> void:
 
 	_create_button = Button.new()
 	_create_button.text = "Create"
+	_create_button.tooltip_text = "Write the file, then open it via the FileSystem dock. Switch to the Gaba Play tab to preview the conversation."
 	_create_button.pressed.connect(_on_create_pressed)
 	button_row.add_child(_create_button)
 

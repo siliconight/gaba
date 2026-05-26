@@ -4,19 +4,35 @@
 
 The product principle: writers should think about *what is happening in the story*, not about graph nodes, IDs, or directives. The graph is real — Gaba compiles to it, runtime walks it, multiplayer replicates it — but you do not have to author in it.
 
-**Status: 0.4.4.** Story Mode authoring, per-choice conditions, writer-friendly validation, a "Create NPC Dialogue" wizard dock, a conversation flow preview dock, nine NPC templates, one-line install, and an optional bridge to the [gool](https://github.com/siliconight/gool) audio engine are working. See [`ROADMAP.md`](ROADMAP.md) for what's still open.
+**Status: 0.4.5.** Story Mode authoring, per-choice conditions, writer-friendly validation, the **Gaba** wizard dock, the **Gaba Play** preview dock, nine NPC templates, one-line install, a `NarrativeHooks` runtime facade, and an optional bridge to the [gool](https://github.com/siliconight/gool) audio engine are working. See [`ROADMAP.md`](ROADMAP.md) for what's still open.
 
-## Features
+## The workflow Gaba is built around
 
-- **Story Mode authoring** — write screenplay, not graphs. No node IDs required.
-- **Per-choice conditions and effects** — different choices appear based on quest state, inventory, faction, anything your game exposes.
-- **Create NPC Dialogue wizard** — Godot dock that copies a template, substitutes your NPC's name throughout, and writes the file. Browse templates at `addons/gaba/templates/`.
-- **Designer-friendly validation** — `✓ 4 scenes, 7 choices, 2 endings` in the output panel; clickable validation dock on the roadmap.
-- **Templates** — seven starting points under `addons/gaba/templates/` for the canonical NPC patterns (greeting, vendor, quest giver, etc.).
-- **Runtime-safe resources** — authored files compile to `.res` resources Godot loads instantly.
-- **Voice-over optional** — text-only is the happy path; VO fields exist for premium content and stay out of the way otherwise.
-- **Audio-engine integrations** — ships an optional bridge to [gool](https://github.com/siliconight/gool) at `addons/gaba/integrations/gool_bridge.gd`. See [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md).
-- **Multiplayer-aware** — sessions can run in authoritative (server) or replica (client) mode. Server validates choices; client displays.
+1. **Create a character** — click the **Gaba** dock, pick a story archetype (greeting, vendor, quest giver, companion, cinematic, …), name your NPC, click Create.
+2. **Write the conversation** — open the file Godot just made and write dialogue in Story Mode: `Blacksmith: Need a blade sharpened?` / `Player: Show me your wares.` No node IDs. No directives.
+3. **Preview the conversation** — switch to the **Gaba Play** dock, load the file, click through choices as if you were the player. Toggle gated choices to see the alternate path.
+4. **Attach gameplay hooks** — in game code, register handlers for the `if:` and `do:` clauses you used: `NarrativeHooks.register_effect("start_quest", ...)`.
+5. **Ship.**
+
+You author intent. Gaba compiles the runtime.
+
+## Start from a template, not a blank file
+
+Templates live at `addons/gaba/templates/` and double as documentation by example. They each demonstrate one canonical NPC pattern:
+
+| Template | Pattern | What it shows |
+|---|---|---|
+| `01_basic_greeting.dlg` | Greeting | Simplest possible NPC, no quests, text-only |
+| `02_vendor.dlg` | Vendor | `do:` effects: `open_shop`, `give_item`, `remove_item` |
+| `03_quest_giver.dlg` | Quest Giver | Per-choice `if:` — choices change based on quest state |
+| `04_quest_turnin.dlg` | Quest Turn-In | Inventory check + completion |
+| `05_ambient_barks.dlg` | Ambient | One-liner NPCs for crowds |
+| `06_branching_reputation.dlg` | Reputation | Same NPC, different personalities by faction |
+| `07_full_vo_story.dlg` | Full VO | The only template with voice-over fields |
+| `08_companion_conversation.dlg` | Companion | Hub-and-spoke party member, returning menu |
+| `09_cinematic_conversation.dlg` | Cinematic | Auto-advancing monologue across multiple scenes |
+
+The **Gaba** wizard dock reads its dropdown from this folder — drop your own template `.dlg` files into `addons/gaba/templates/` and they appear automatically. The leading `#` comment lines become the title and description in the dropdown.
 
 ## Install
 
@@ -80,10 +96,16 @@ Browse [`addons/gaba/templates/`](addons/gaba/templates/) for working examples �
 extends Node
 
 func _ready() -> void:
-    # Register game-side handlers once at startup.
-    DialogueManager.effects.register("start_quest", _start_quest)
-    DialogueManager.effects.register("open_shop", _open_shop)
-    DialogueManager.conditions.register("quest_state", _quest_state)
+    # Register game-side handlers once at startup. NarrativeHooks is the
+    # designer-facing facade — it routes to DialogueManager.effects /
+    # .conditions internally.
+    NarrativeHooks.register_effects({
+        "start_quest": _start_quest,
+        "open_shop": _open_shop,
+    })
+    NarrativeHooks.register_conditions({
+        "quest_state": _quest_state,
+    })
 
 func talk_to_blacksmith() -> void:
     var dlg: DialogueResource = load("res://dialogues/blacksmith.tres")

@@ -2,6 +2,32 @@
 
 All notable changes to Gaba will be documented in this file.
 
+## [0.4.4] - 2026-05-25
+
+The conversation flow preview pane — the last remaining substantive stakeholder ask. Writers can now click through a `.dlg` like a player and feel the pacing, without launching the game.
+
+### Added
+- **`addons/gaba/editor/dialogue_preview_dock.gd`** — a new dock control registered alongside the wizard. Godot auto-tabs it next to the existing **Gaba** tab; look for **Gaba Play**.
+- Reparses the `.dlg` file from disk on Load (does NOT use the cached `.res`), so writers see the post-edit state immediately without waiting for Godot's reimport pass.
+- Renders speaker name, NPC text (multi-paragraph preserved), and one button per visible choice. Click a choice → advance to its target scene; terminal choices end the conversation; bare `=>` continue prompts render as "(continue)" buttons.
+- **Choice gating toggle**: "Show choices with conditions" on (default) shows every choice; off hides choices with `if:` clauses, approximating what a fresh-state player would see. Choices that have conditions get a "(gated)" suffix when visible, so writers can tell them apart.
+- **Triggered effects log** — every `do:` effect fires into a green list under the choices, tagged with its source ("choice 'Show me your wares.'" vs "scene quest_offer"). Effects are LOGGED, not executed; the preview has no game state.
+- **Reset button** returns to the start scene and clears the effects log.
+- **Validation results** from the loaded file are summarised in the status line using the same `format_friendly()` output the importer uses.
+
+### Changed
+- `plugin.gd` now registers two dock controls in the right-bottom-left slot. Disable cleanup teardown both. The existing wizard tab is unchanged.
+
+### Caveats
+Same as the wizard: editor UI cannot be verified outside a running Godot editor. The code is defensive (null-checks on every parse / file / has_node call, explicit handling of empty/broken/ended states, ScrollContainer for overflowing effect logs) but the first runtime test will tell us whether `add_control_to_dock` with two controls in the same slot tabs them as expected. If only one tab appears, the dock-slot constant probably needs adjusting — easy fix.
+
+### Roadmap items addressed
+Stakeholder item #5 (conversation flow preview before a full graph editor) — shipped.
+
+### Still open on the v0.4.x roadmap
+- Validation panel dock (consumes the same `format_friendly()` data; the friendly format already lands in the Output panel today)
+- Configurable mock handlers (set specific flag values to test specific paths, beyond the binary all-on / all-off toggle)
+
 ## [0.4.3] - 2026-05-25
 
 Stakeholder feedback round 2: confirmed Gaba's direction is narrative-first and asked for finishing-touch items on tone, templates, and positioning. This release lands the small ones; preview pane (the big remaining item) stays the next milestone.

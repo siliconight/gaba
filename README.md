@@ -4,7 +4,7 @@
 
 The product principle: writers should think about *what is happening in the story*, not about graph nodes, IDs, or directives. The graph is real — Gaba compiles to it, runtime walks it, multiplayer replicates it — but you do not have to author in it.
 
-**Status: 0.4.3.** Story Mode authoring, per-choice conditions, writer-friendly validation, a "Create NPC Dialogue" wizard dock, nine NPC templates, one-line install, and an optional bridge to the [gool](https://github.com/siliconight/gool) audio engine are working. Conversation flow preview pane is next — see [`ROADMAP.md`](ROADMAP.md).
+**Status: 0.4.4.** Story Mode authoring, per-choice conditions, writer-friendly validation, a "Create NPC Dialogue" wizard dock, a conversation flow preview dock, nine NPC templates, one-line install, and an optional bridge to the [gool](https://github.com/siliconight/gool) audio engine are working. See [`ROADMAP.md`](ROADMAP.md) for what's still open.
 
 ## Features
 

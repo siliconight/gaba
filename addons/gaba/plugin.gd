@@ -9,9 +9,11 @@ extends EditorPlugin
 const AUTOLOAD_NAME := "DialogueManager"
 const AUTOLOAD_PATH := "res://addons/gaba/runtime/dialogue_manager.gd"
 const WIZARD_DOCK_SCRIPT := preload("res://addons/gaba/editor/dialogue_wizard_dock.gd")
+const PREVIEW_DOCK_SCRIPT := preload("res://addons/gaba/editor/dialogue_preview_dock.gd")
 
 var _importer: EditorImportPlugin
 var _wizard_dock: Control
+var _preview_dock: Control
 
 
 func _enter_tree() -> void:
@@ -27,6 +29,11 @@ func _enter_tree() -> void:
 	_wizard_dock = WIZARD_DOCK_SCRIPT.new()
 	add_control_to_dock(EditorPlugin.DOCK_SLOT_RIGHT_BL, _wizard_dock)
 
+	# Add the conversation preview dock next to it. Godot auto-tabs controls
+	# in the same dock slot, so the user sees "Gaba" and "Gaba Play" tabs.
+	_preview_dock = PREVIEW_DOCK_SCRIPT.new()
+	add_control_to_dock(EditorPlugin.DOCK_SLOT_RIGHT_BL, _preview_dock)
+
 	print("[Gaba] Plugin enabled. Drop .dlg files into your project to import them.")
 
 
@@ -38,5 +45,9 @@ func _exit_tree() -> void:
 		remove_control_from_docks(_wizard_dock)
 		_wizard_dock.queue_free()
 		_wizard_dock = null
+	if _preview_dock != null:
+		remove_control_from_docks(_preview_dock)
+		_preview_dock.queue_free()
+		_preview_dock = null
 	remove_autoload_singleton(AUTOLOAD_NAME)
 	print("[Gaba] Plugin disabled.")

@@ -4,7 +4,7 @@
 
 The product principle: writers should think about *what is happening in the story*, not about graph nodes, IDs, or directives. The graph is real — Gaba compiles to it, runtime walks it, multiplayer replicates it — but you do not have to author in it.
 
-**Status: 0.4.5.** Story Mode authoring, per-choice conditions, writer-friendly validation, the **Gaba** wizard dock, the **Gaba Play** preview dock, nine NPC templates, one-line install, a `NarrativeHooks` runtime facade, and an optional bridge to the [gool](https://github.com/siliconight/gool) audio engine are working. See [`ROADMAP.md`](ROADMAP.md) for what's still open.
+**Status: 0.4.5.** Story Mode authoring, per-choice conditions, writer-friendly validation, the **Gaba** wizard dock, the **Gaba Play** preview dock, nine NPC templates, one-line install, a `NarrativeHooks` runtime facade, and an optional bridge to the [gool](https://github.com/siliconight/gool) audio engine are working. Want lines *spoken*? [grunt](https://github.com/siliconight/grunt) bakes license-clean VO clips that drop straight in — see [Voices](#voices-optional). See [`ROADMAP.md`](ROADMAP.md) for what's still open.
 
 ## The workflow Gaba is built around
 
@@ -130,6 +130,32 @@ func _quest_state(args: PackedStringArray, ctx: Dictionary) -> bool:
     return false
 ```
 
+## Voices (optional)
+
+Gaba is text-first — it runs with no audio at all. When you want lines *spoken*, two sibling tools drop in beside it, and skipping them changes nothing here:
+
+- **[grunt](https://github.com/siliconight/grunt)** — type a line, get a license-clean, game-ready `.ogg`. No mic, no studio, no VO budget.
+- **[gool](https://github.com/siliconight/gool)** — the audio engine that plays those clips in 3D at runtime.
+
+**The contract is a name.** A line's `vo:` id is the clip name grunt bakes *and* the sound name gool plays. Match the three and the line speaks; leave any of them out and that line is simply silent — VO is per-line optional, always.
+
+1. Install [gool](https://github.com/siliconight/gool) and enable it (adds the `Gool` autoload).
+2. Add `res://addons/gaba/integrations/gool_bridge.gd` as an autoload named `GabaGoolBridge`, ordered **after** both `DialogueManager` and `Gool`. This routes VO automatically; without it, dialogue stays text-only.
+3. Bake clips with [grunt](https://github.com/siliconight/grunt) and register them with gool so `Gool.has_sound("name")` is true.
+
+Name the VO on any line you want voiced:
+
+```
+Oracle:
+Go. Restore what your fathers broke.
+vo: oracle_farewell
+playback: auto_advance
+```
+
+Bake a grunt clip named `oracle_farewell`; the bridge plays it spatially when the line is reached. With `playback: auto_advance`, that clip *also* steps the conversation forward when it ends — so a voiced cutscene needs no advance code at all. A line with no `vo:`, or whose clip gool doesn't have yet, just shows its text.
+
+> Today you match those three names by hand. An exporter that bakes a whole conversation's VO in one pass — names lined up by construction — isn't built yet. Deeper wiring (playback modes, skip, barks, FMOD/Wwise) lives in [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md).
+
 ## Repository layout
 
 ```
@@ -142,7 +168,7 @@ addons/gaba/
     runtime/                        # DialogueManager + DialogueSession + registries
     integrations/                   # optional bridges (gool_bridge.gd)
     editor/                         # Gaba wizard dock; validation panel + preview next
-    templates/                      # 7 starting points for new NPC dialogues
+    templates/                      # 9 starting points for new NPC dialogues
 
 examples/dialogues/blacksmith.dlg   # original canonical example
 docs/                               # AUTHORING.md, ARCHITECTURE.md, MULTIPLAYER.md,

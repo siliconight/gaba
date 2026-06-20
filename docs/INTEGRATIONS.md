@@ -2,6 +2,21 @@
 
 Gaba intentionally does no audio routing of its own — it carries the *data* about voice-over (event ID, audio path, subtitle key, playback behavior) and lets your game route it. This file documents the supported integration patterns.
 
+## Producing the clips (grunt)
+
+The routing patterns below assume the named clips already exist in your audio engine's bank. [grunt](https://github.com/siliconight/grunt) is the sibling tool that makes them: type a line, get a license-clean Vorbis `.ogg`, drop it into `res://`. No mic, no studio, no VO budget, no third-party-sample licensing exposure.
+
+**The clip name is the whole contract.** The name grunt bakes a clip under is the same string you put in a node's `vo:` (`voiceover_event_id`), which is the same name gool resolves through `has_sound()`:
+
+```
+grunt bakes          gaba (.dlg)             gool plays
+goblin_taunt_01  →   vo: goblin_taunt_01  →  Gool.has_sound("goblin_taunt_01")
+```
+
+Match all three and the line speaks; miss any one and the bridge logs a warning and the line plays text-only (see [gool](#gool-audio-engine) below). Today you keep the names in sync by hand — write the line in gaba, bake a clip of the same name in grunt. An exporter that walks a `DialogueResource` and emits a grunt batch job, generating the names on both sides at once, is the obvious next step but isn't built yet.
+
+grunt also covers the non-lexical layer dialogue lines rarely spell out — barks, grunts, screams, efforts — so you can reserve recorded VO for key story moments and let grunt fill the everything-else.
+
 ## gool (audio engine)
 
 [gool](https://github.com/siliconight/gool) is a Godot 4 audio engine with prefab nodes, a JSON sound bank, and multiplayer-aware playback. It maps cleanly onto Gaba's voice-over fields.

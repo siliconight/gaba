@@ -2,6 +2,20 @@
 
 All notable changes to Gaba will be documented in this file.
 
+## [0.4.6] - 2026-06-20
+
+Discoverability pass for voice-over. The VO *data model* and gool *routing* were already documented, but nothing told a gaba-only user where the clips actually come from — so [grunt](https://github.com/siliconight/grunt), the sibling tool that bakes them, was invisible across the whole doc surface. This iteration closes that gap. Docs only; no code or API changes.
+
+### Added
+- **README "Voices (optional)" section** — placed after "Playing a dialogue". Frames the grunt → gaba → gool chain, makes explicit that the shared *clip name* is the only contract, and shows a minimal voiced-line example. Leads with "text-first, audio is optional" so writers who only want text can skip it.
+- **`docs/INTEGRATIONS.md` "Producing the clips (grunt)" section** — added above the existing gool routing docs, which had assumed the named clips already existed in the bank. Documents the name contract (`grunt bake` → `vo:` → `Gool.has_sound()`) and that the three names are matched by hand today.
+
+### Changed
+- **README Status line** now points to grunt for spoken lines, alongside the existing gool reference.
+
+### Fixed
+- Repo-layout comment in the README said "7 starting points" for templates; corrected to "9" to match the status line and the template table.
+
 ## [0.4.5] - 2026-05-25
 
 Stakeholder feedback round 3 landing. Five items shipped, two deferred to v0.5 with explicit roadmap entries (implicit scene linking; Writer/Engineer mode toggle), three already covered.

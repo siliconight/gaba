@@ -17,6 +17,25 @@ Match all three and the line speaks; miss any one and the bridge logs a warning 
 
 grunt also covers the non-lexical layer dialogue lines rarely spell out — barks, grunts, screams, efforts — so you can reserve recorded VO for key story moments and let grunt fill the everything-else.
 
+### Exporting a VO job
+
+`GabaGruntExport` turns a dialogue into a grunt `batch` CSV so you don't type each line into grunt by hand and the names match automatically:
+
+```gdscript
+GabaGruntExport.export_dlg_folder("res://dialogues", "res://vo_job.csv", {
+    "casting": {"Blacksmith": "jersey", "Oracle": "norman"},
+    "default_character": "narrator",
+})
+```
+
+```
+grunt batch --csv vo_job.csv --out-dir vo/
+```
+
+The CSV is `name,text,character`: column 0 is the clip name from [`GabaVoNaming`](../addons/gaba/integrations/vo_naming.gd) (`<dialogue_id>__<node_id>` unless the node sets `vo:`), column 2 the grunt character from your casting map. Because the bridge derives the *same* name (`auto_derive_vo_names`, on by default), the baked clips play with no `vo:` lines authored — drop the `vo/` folder in, register it with gool, done.
+
+One caveat for now: grunt's `batch` parser splits on commas without honoring quotes, so lines with commas need a grunt build with quoted-field support. Comma-free lines round-trip on any grunt today.
+
 ## gool (audio engine)
 
 [gool](https://github.com/siliconight/gool) is a Godot 4 audio engine with prefab nodes, a JSON sound bank, and multiplayer-aware playback. It maps cleanly onto Gaba's voice-over fields.

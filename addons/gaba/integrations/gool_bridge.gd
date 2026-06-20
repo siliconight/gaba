@@ -76,6 +76,14 @@ signal vo_finished(session, node)
 ## warning per contract violation. Off for shipping if you've got log noise.
 @export var enable_logging: bool = true
 
+## When a node has no explicit `vo:` event id, derive `<dialogue_id>__<node_id>`
+## and try that name in gool's bank — the same name the grunt exporter bakes
+## under. Lets you bake a whole conversation's VO and play it without writing
+## `vo:` on every line. Missing derived clips are silent (the line plays as
+## text); a missing *explicit* `vo:` still warns, since that's likely a typo.
+## Turn off to require explicit `vo:` ids.
+@export var auto_derive_vo_names: bool = true
+
 
 # --- playback_behavior string constants ---
 # Match the values documented in docs/AUTHORING.md and the default on
@@ -153,20 +161,27 @@ func _on_node_entered(node, session) -> void:
 	# Stop any VO left over from the previous node first.
 	_stop_vo(session, default_fade_out_ms)
 
-	if not node.has_voiceover():
+	# A node with only an audio path (no event id) can't route through this
+	# bridge — note it once, then bail.
+	if node.voiceover_event_id.is_empty() and not node.voiceover_audio_path.is_empty():
+		if enable_logging:
+			push_warning("[GabaGoolBridge] node '%s' has voiceover_audio_path but no voiceover_event_id; this bridge plays by event id only. Register the file with gool's sound bank and reference it by name." % node.node_id)
 		return
 
-	var sound_name: String = node.voiceover_event_id
+	var explicit := not node.voiceover_event_id.is_empty()
+	var sound_name := _resolve_vo_name(node, session)
 	if sound_name.is_empty():
-		if not node.voiceover_audio_path.is_empty() and enable_logging:
-			push_warning("[GabaGoolBridge] node '%s' has voiceover_audio_path but no voiceover_event_id; only event-id playback is supported by this bridge. Register the file with gool's sound bank and reference it by name." % node.node_id)
 		return
 
 	# Cross-script contract: assert gool knows the sound BEFORE asking for an
 	# emitter. Per the v0.66.0 introspection API, has_sound() is the right
 	# defensive call here.
 	if _gool.has_method("has_sound") and not _gool.has_sound(sound_name):
-		push_warning("[GabaGoolBridge] gool has no sound '%s' — skipping VO on node '%s'. Check your sound bank." % [sound_name, node.node_id])
+		# A missing *explicit* vo: is probably a typo — surface it. A missing
+		# *derived* name just means this line wasn't baked — stay silent and
+		# let it play as text.
+		if explicit and enable_logging:
+			push_warning("[GabaGoolBridge] gool has no sound '%s' — skipping VO on node '%s'. Check your sound bank." % [sound_name, node.node_id])
 		return
 
 	if not _gool.has_method("create_emitter"):
@@ -191,6 +206,23 @@ func _on_node_entered(node, session) -> void:
 	# If gool doesn't notify us when the emitter ends, schedule a fallback.
 	if not _gool_has_finished_signal:
 		_schedule_finish_timer(session, node, handle)
+
+
+# Resolve the gool sound name for a node: an explicit voiceover_event_id wins;
+# otherwise, if auto_derive_vo_names is on and the node has text, derive the
+# same `<dialogue_id>__<node_id>` name the grunt exporter bakes under. Returns
+# "" when there's nothing to play.
+func _resolve_vo_name(node, session) -> String:
+	if not node.voiceover_event_id.is_empty():
+		return node.voiceover_event_id
+	if not auto_derive_vo_names:
+		return ""
+	if str(node.text).strip_edges().is_empty():
+		return ""
+	var dialogue_id := ""
+	if session != null and session.dialogue != null:
+		dialogue_id = session.dialogue.dialogue_id
+	return GabaVoNaming.derived_name(dialogue_id, node.node_id)
 
 
 func _on_session_ended(session) -> void:

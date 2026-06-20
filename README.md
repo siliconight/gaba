@@ -169,7 +169,7 @@ playback: auto_advance
 
 Bake a grunt clip named `oracle_farewell`; the bridge plays it spatially when the line is reached. With `playback: auto_advance`, that clip *also* steps the conversation forward when it ends — so a voiced cutscene needs no advance code at all. A line with no `vo:`, or whose clip gool doesn't have yet, just shows its text.
 
-> Today you match those three names by hand. An exporter that bakes a whole conversation's VO in one pass — names lined up by construction — isn't built yet. Deeper wiring (playback modes, skip, barks, FMOD/Wwise) lives in [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md).
+> Names line up automatically: `GabaGruntExport` writes a grunt `batch` CSV for a whole conversation, and the bridge derives the same `<dialogue_id>__<node_id>` names — so you often don't author `vo:` at all. See [VO export](docs/INTEGRATIONS.md#exporting-a-vo-job). Deeper wiring (playback modes, skip, barks, FMOD/Wwise) lives in [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md).
 
 ## Repository layout
 
@@ -181,7 +181,7 @@ addons/gaba/
     importer/                       # .dlg → Resource pipeline
     validators/                     # semantic validation
     runtime/                        # DialogueManager + DialogueSession + registries
-    integrations/                   # optional bridges (gool_bridge.gd)
+    integrations/                   # gool bridge, grunt VO export, naming contract
     ui/                             # drop-in DialogueBox (DialogueBox.tscn)
     editor/                         # Gaba wizard dock; validation panel + preview next
     templates/                      # 9 starting points for new NPC dialogues

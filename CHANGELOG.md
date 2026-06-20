@@ -2,6 +2,20 @@
 
 All notable changes to Gaba will be documented in this file.
 
+## [0.6.0] - 2026-06-20
+
+The VO pipeline gets its missing link. You could route voice-over to gool and bake clips in grunt, but nothing connected the two — you matched clip names by hand. This release makes the names line up by construction.
+
+### Added
+- **`GabaVoNaming`** (`addons/gaba/integrations/vo_naming.gd`) — the single source of truth for the clip-name contract. An explicit `vo:` wins; otherwise the name is derived deterministically as `<dialogue_id>__<node_id>`, sanitised to a bank-safe token. Both the exporter and the bridge derive names here, so they can never drift.
+- **`GabaGruntExport`** (`addons/gaba/integrations/grunt_export.gd`) — walks a `DialogueResource`, a list of `.dlg` files, or a folder, and writes a [grunt](https://github.com/siliconight/grunt) `batch` CSV (`name,text,character`) with one row per voiced line. Per-speaker casting maps speakers to grunt characters; text is flattened to one line and RFC-4180 quoted. Parses `.dlg` directly via the runtime parser, so it works in-editor or headless. The loop becomes: export → `grunt batch` → drop the folder in.
+
+### Changed
+- **Gool bridge derives names too.** When a node has no explicit `vo:`, the bridge now tries `<dialogue_id>__<node_id>` against gool's bank (new `auto_derive_vo_names` export, on by default), so VO baked from the exporter plays with no `vo:` lines authored at all. Missing *derived* clips are silent (line plays as text); a missing *explicit* `vo:` still warns, since that's likely a typo.
+
+### Notes
+- grunt's current `batch` CSV parser splits on commas without honoring quotes, so lines containing commas need a grunt build with quoted-field support to round-trip. Comma-free lines work on any grunt today. (grunt-side fix is small and tracked separately.)
+
 ## [0.5.0] - 2026-06-20
 
 The missing body. Gaba shipped a dialogue *runtime* but no UI, so getting an authored conversation on screen meant hand-writing a node that loaded the resource, connected signals, built label-and-button UI, and called `select_choice()`. This release ships a drop-in box and a runnable example, so the whole integration is three lines.

@@ -4,7 +4,7 @@
 
 The product principle: writers should think about *what is happening in the story*, not about graph nodes, IDs, or directives. The graph is real — Gaba compiles to it, runtime walks it, multiplayer replicates it — but you do not have to author in it.
 
-**Status: 0.4.5.** Story Mode authoring, per-choice conditions, writer-friendly validation, the **Gaba** wizard dock, the **Gaba Play** preview dock, nine NPC templates, one-line install, a `NarrativeHooks` runtime facade, and an optional bridge to the [gool](https://github.com/siliconight/gool) audio engine are working. Want lines *spoken*? [grunt](https://github.com/siliconight/grunt) bakes license-clean VO clips that drop straight in — see [Voices](#voices-optional). See [`ROADMAP.md`](ROADMAP.md) for what's still open.
+**Status: 0.4.5.** Story Mode authoring, per-choice conditions, writer-friendly validation, the **Gaba** wizard dock, the **Gaba Play** preview dock, nine NPC templates, one-line install, a `NarrativeHooks` runtime facade, a drop-in **DialogueBox** UI, and an optional bridge to the [gool](https://github.com/siliconight/gool) audio engine are working. Want lines *spoken*? [grunt](https://github.com/siliconight/grunt) bakes license-clean VO clips that drop straight in — see [Voices](#voices-optional). See [`ROADMAP.md`](ROADMAP.md) for what's still open.
 
 ## The workflow Gaba is built around
 
@@ -90,7 +90,22 @@ Godot imports it on save. The result is a `DialogueResource` you `load()` like a
 
 Browse [`addons/gaba/templates/`](addons/gaba/templates/) for working examples — or just use the wizard. See [`docs/AUTHORING.md`](docs/AUTHORING.md) for the full reference, including Structured Mode for engineers who want explicit node IDs.
 
+## Drop-in dialogue UI
+
+The fastest way to get an authored conversation on screen — no signal wiring, no custom UI. Instance the box, hand it a `.dlg`, and it runs the whole conversation: speaker name, typewriter text, choice buttons, continue prompts, and calling `select_choice()` for you.
+
+```gdscript
+var box := preload("res://addons/gaba/ui/DialogueBox.tscn").instantiate()
+add_child(box)
+box.play(load("res://dialogues/blacksmith.dlg"))
+box.finished.connect(func(): print("conversation over"))
+```
+
+Voice-over plays automatically when the [gool bridge](#voices-optional) is active, and the line is silent otherwise — VO stays optional. Want to see it first? Open `examples/runnable/demo.tscn` and press **F6** (Run Current Scene) for working dialogue with no game code.
+
 ## Playing a dialogue
+
+Prefer your own UI — portraits, custom pacing, bespoke layout? Drive the session directly instead of using the box:
 
 ```gdscript
 extends Node
@@ -167,10 +182,12 @@ addons/gaba/
     validators/                     # semantic validation
     runtime/                        # DialogueManager + DialogueSession + registries
     integrations/                   # optional bridges (gool_bridge.gd)
+    ui/                             # drop-in DialogueBox (DialogueBox.tscn)
     editor/                         # Gaba wizard dock; validation panel + preview next
     templates/                      # 9 starting points for new NPC dialogues
 
 examples/dialogues/blacksmith.dlg   # original canonical example
+examples/runnable/demo.tscn         # runnable showcase — open and press F6
 docs/                               # AUTHORING.md, ARCHITECTURE.md, MULTIPLAYER.md,
                                     #   INTEGRATIONS.md, EXTENDING.md
 ```

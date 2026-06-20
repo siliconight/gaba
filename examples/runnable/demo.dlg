@@ -1,0 +1,35 @@
+# Demo
+# A self-contained showcase for the drop-in DialogueBox. No `if:` / `do:`
+# hooks, so it runs with zero game code. Each NPC beat is its own Scene
+# (story mode = one NPC line per scene), linked with `=>`.
+
+NPC: Guide
+
+Guide:
+Welcome to Gaba — this whole conversation is running from a plain .dlg file.
+playback: auto_advance
+=> Choose
+
+Scene: Choose
+Guide:
+Pick a path. Both feel exactly the same to your players.
+
+Player:
+Tell me about voices.
+=> Voices
+
+Player:
+Just finish the demo.
+=> Done
+
+Scene: Voices
+Guide:
+Add a vo: line to any beat and the optional grunt + gool tools speak it. Skip them and it stays text — voices are per-line optional.
+
+Player:
+Got it.
+=> Done
+
+Scene: Done
+Guide:
+That's the whole loop: write the lines, drop in a DialogueBox, ship. Press the advance key to close.

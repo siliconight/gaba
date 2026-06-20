@@ -2,6 +2,18 @@
 
 All notable changes to Gaba will be documented in this file.
 
+## [0.5.0] - 2026-06-20
+
+The missing body. Gaba shipped a dialogue *runtime* but no UI, so getting an authored conversation on screen meant hand-writing a node that loaded the resource, connected signals, built label-and-button UI, and called `select_choice()`. This release ships a drop-in box and a runnable example, so the whole integration is three lines.
+
+### Added
+- **Drop-in `DialogueBox`** (`addons/gaba/ui/DialogueBox.tscn` + `dialogue_box.gd`, `class_name GabaDialogueBox`). Instance it, call `play(dlg)`, done — it drives the session and calls `select_choice()` itself. Builds its own layout in code (works even as a bare `Control`), with a typewriter, keyboard/controller choice focus, and `finished` / `line_shown` signals. Handles the cases that bite hand-rolled UIs: bare `=>` continue prompts (advance, don't draw a blank button), terminal lines (kept on screen for dismissal instead of flashing past), and text-only `auto_advance` (stepped by a reading-time timer when no VO is driving it). Gool-bridge aware: honors `is_input_blocked` and `skip_current_vo` when the bridge is active, and is fully functional without it.
+- **Runnable example** (`examples/runnable/demo.tscn` + `demo.gd` + `demo.dlg`). Open the scene, press F6, see working dialogue — an auto-advancing intro, a branch, a terminal close — with no game code. Doubles as a copy-paste starting point.
+- **README "Drop-in dialogue UI" section** showing the three-line integration as the easy path, ahead of the manual signal-wiring example.
+
+### Changed
+- README repo-layout and status updated to mention `ui/` and the example.
+
 ## [0.4.6] - 2026-06-20
 
 Discoverability pass for voice-over. The VO *data model* and gool *routing* were already documented, but nothing told a gaba-only user where the clips actually come from — so [grunt](https://github.com/siliconight/grunt), the sibling tool that bakes them, was invisible across the whole doc surface. This iteration closes that gap. Docs only; no code or API changes.

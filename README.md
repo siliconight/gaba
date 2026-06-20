@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/gaba_256.png" width="128" alt="Gaba logo">
+</p>
+
 # Gaba
 
 **A narrative-first dialogue authoring system for Godot 4.** Writers describe conversations like screenplays; Gaba compiles them into validated, multiplayer-safe runtime dialogue graphs your game plays.

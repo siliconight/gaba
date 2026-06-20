@@ -2,6 +2,15 @@
 
 All notable changes to Gaba will be documented in this file.
 
+## [0.6.1] - 2026-06-20
+
+Branding. Gaba has a logo — a low-poly teal typewriter, fitting for a writer-first tool.
+
+### Added
+- **`assets/gaba.png`** (1254×1254 source) plus downscaled variants `gaba_512` / `256` / `128` / `64` / `32` / `16` for README, Asset Library, and editor use.
+- README now opens with the logo.
+- `project.godot` sets the dev project's window icon to the logo.
+
 ## [0.6.0] - 2026-06-20
 
 The VO pipeline gets its missing link. You could route voice-over to gool and bake clips in grunt, but nothing connected the two — you matched clip names by hand. This release makes the names line up by construction.

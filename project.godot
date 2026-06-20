@@ -8,6 +8,7 @@ config_version=5
 
 config/name="Gaba"
 config/description="Godot-native dialogue authoring and runtime system."
+config/icon="res://assets/gaba_256.png"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 
 [editor_plugins]
